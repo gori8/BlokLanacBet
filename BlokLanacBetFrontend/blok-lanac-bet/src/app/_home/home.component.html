@@ -1,0 +1,37 @@
+<div *ngFor="let game of games">
+  <div class="card-center-div">
+    <mat-card
+      ><button mat-button disabled>
+        <img [src]="game.hTeam.logo" height="40" width="40" />
+      </button>
+      {{ game.hTeam.fullName }}</mat-card
+    >
+    <mat-card class="scores-card">{{ game.simple_score }}</mat-card>
+    <mat-card
+      >{{ game.vTeam.fullName }}
+      <button mat-button disabled>
+        <img [src]="game.vTeam.logo" height="40" width="40" /></button
+    ></mat-card>
+  </div>
+  <div class="ticket-button-row">
+    <button
+      mat-raised-button
+      color="primary"
+      class="button-ticket lr-button"
+      (click)="addBet({ game: game.hTeam.fullName, quota: 1.8 })"
+    >
+      XXXXXXXXXXXXX
+    </button>
+    <button
+      mat-raised-button
+      color="primary"
+      class="button-ticket center-button"
+    >
+      XXXXXXXXXXXX
+    </button>
+    <button mat-raised-button color="primary" class="button-ticket lr-button">
+      XXX
+    </button>
+  </div>
+  <mat-divider></mat-divider>
+</div>

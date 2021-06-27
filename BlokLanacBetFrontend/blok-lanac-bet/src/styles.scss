@@ -1,0 +1,43 @@
+/* You can add global styles to this file, and also import other style files */
+
+html,
+body {
+  height: 100%;
+}
+body {
+  margin: 0;
+  font-family: Roboto, "Helvetica Neue", sans-serif;
+}
+mat-card {
+  text-align: center;
+  width: 25%;
+  margin-top: 40px;
+}
+.card-center-div {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.scores-card {
+  width: 10%;
+  margin-left: 20px;
+  margin-right: 20px;
+}
+.button-ticket {
+  width: 22.3%;
+}
+.ticket-button-row {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.ticket-button-row .center-button {
+  margin: 20px 20px 40px 20px;
+}
+.ticket-button-row .lr-button {
+  margin: 20px 0 40px 0;
+}
+.logo {
+  width: 100;
+  height: 100;
+}
