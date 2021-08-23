@@ -1,4 +1,4 @@
-var ScoresAndQuotas = artifacts.require("ScoresAndQuotas");
+var Bookmaker = artifacts.require("Bookmaker");
 var BlokLanacBet = artifacts.require("BlokLanacBet");
 
 // JavaScript export
@@ -8,7 +8,7 @@ module.exports = function (deployer) {
 
   // Deploy the contract to the network
   deployer.then(async () => {
-    await deployer.deploy(ScoresAndQuotas);
-    await deployer.deploy(BlokLanacBet, ScoresAndQuotas.address);
+    await deployer.deploy(Bookmaker);
+    await deployer.deploy(BlokLanacBet, Bookmaker.address);
   });
 };

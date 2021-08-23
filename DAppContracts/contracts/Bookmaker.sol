@@ -14,7 +14,7 @@ struct GameScore {
   uint8 away;
 }
 
-contract ScoresAndQuotas {
+contract Bookmaker {
     using Strings for string;
     using Integers for uint;
     using Addresses for address;
@@ -22,7 +22,7 @@ contract ScoresAndQuotas {
     mapping(uint16 => GameScore) public gameScores;
     mapping(uint16 => Quotas) public gameQuotas;
 
-    constructor() public {}
+    constructor(){}
 
     function bytes32ToString(bytes32 _bytes32)
         private
@@ -56,8 +56,6 @@ contract ScoresAndQuotas {
         }
         return result;
     }
-
-    
 
 
     function fulfill(bytes32 _data) external{
