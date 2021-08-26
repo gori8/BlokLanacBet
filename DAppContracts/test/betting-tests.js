@@ -30,10 +30,60 @@ contract("BlokLanacBet", (accounts) => {
     await instance.fulfill(web3.utils.asciiToHex("s-120-115-9461"));
     await instance.fulfill(web3.utils.asciiToHex("q-180-720-220-9460"));
     await instance.fulfill(web3.utils.asciiToHex("q-150-920-300-9461"));
-    let bet = { games: [9460, 9461], bets: [2, 1] };
-    await instanceBLBet.makeBet(accounts[0], bet);
-    let result = await instanceBLBet.processBetResult(accounts[0]);
-    assert.equal(result.toNumber(), 220 * 150, "Bet process not working!");
+    let winningBetAmount = web3.utils.toWei("0.02", "ether");
+    let winningBet = {
+      games: [9460, 9461],
+      bets: [2, 1],
+      amount: winningBetAmount,
+    };
+    await instanceBLBet.makeBet(accounts[1], winningBet, {
+      from: accounts[1],
+      value: winningBetAmount,
+    });
+    let losingBetAmount = web3.utils.toWei("0.2", "ether");
+    let losingBet = {
+      games: [9460, 9461],
+      bets: [1, 1],
+      amount: losingBetAmount,
+    };
+    await instanceBLBet.makeBet(accounts[2], losingBet, {
+      from: accounts[2],
+      value: losingBetAmount,
+    });
+
+    let balance = await web3.eth.getBalance(accounts[1]);
+    let res = await instanceBLBet.processBetResult.sendTransaction(accounts[1]);
+    let balance1 = await web3.eth.getBalance(accounts[1]);
+    let expectedResult = (winningBetAmount * 220 * 150) / Math.pow(10, 4);
+    assert.equal(
+      parseFloat(web3.utils.fromWei(balance, "ether")) +
+        parseFloat(web3.utils.fromWei(expectedResult.toString(), "ether")),
+      parseFloat(web3.utils.fromWei(balance1, "ether")),
+      "Bet process not working!"
+    );
+  });
+});
+
+contract("BlokLanacBet", (accounts) => {
+  it("Balance on Contract should be 0.2eth", async function () {
+    let instance = await Bookmaker.deployed();
+    let instanceBLBet = await BlokLanacBet.deployed();
+    await instance.fulfill(web3.utils.asciiToHex("s-101-105-9460"));
+    await instance.fulfill(web3.utils.asciiToHex("s-120-115-9461"));
+    await instance.fulfill(web3.utils.asciiToHex("q-180-720-220-9460"));
+    await instance.fulfill(web3.utils.asciiToHex("q-150-920-300-9461"));
+    let betAmount = web3.utils.toWei("0.2", "ether");
+    let bet = { games: [9460, 9461], bets: [2, 1], amount: betAmount };
+    await instanceBLBet.makeBet(accounts[1], bet, {
+      from: accounts[0],
+      value: betAmount,
+    });
+    let balance = await web3.eth.getBalance(instanceBLBet.address);
+    assert.equal(
+      web3.utils.fromWei(balance, "ether"),
+      0.2,
+      "Payment process not working!"
+    );
   });
 });
 
