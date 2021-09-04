@@ -11,10 +11,17 @@ import { MatCardModule } from '@angular/material/card';
 import { HttpClientModule } from '@angular/common/http';
 import { MatButtonModule } from '@angular/material/button';
 import { MatDividerModule } from '@angular/material/divider';
+import { MatToolbarModule } from '@angular/material/toolbar';
+import { MatIconModule } from '@angular/material/icon';
 import { BetsCartComponent } from './bets-cart/bets-cart.component';
 
 @NgModule({
-  declarations: [AppComponent, NavbarComponent, HomeComponent, BetsCartComponent],
+  declarations: [
+    AppComponent,
+    NavbarComponent,
+    HomeComponent,
+    BetsCartComponent,
+  ],
   imports: [
     BrowserModule,
     AppRoutingModule,
@@ -24,6 +31,8 @@ import { BetsCartComponent } from './bets-cart/bets-cart.component';
     MatCardModule,
     MatButtonModule,
     MatDividerModule,
+    MatToolbarModule,
+    MatIconModule,
   ],
   providers: [],
   bootstrap: [AppComponent],
