@@ -102,6 +102,10 @@ contract BlokLanacBet {
         result = result / 10**(games.length * 2);
         return result;
     }
+
+    receive() external payable {
+        require(msg.sender==owner);
+    }
 }
 
 interface IBookmaker {

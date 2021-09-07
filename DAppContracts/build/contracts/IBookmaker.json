@@ -69,7 +69,7 @@
       "type": "function"
     }
   ],
-  "metadata": "{\"compiler\":{\"version\":\"0.8.6+commit.11564f7e\"},\"language\":\"Solidity\",\"output\":{\"abi\":[{\"inputs\":[{\"internalType\":\"uint16\",\"name\":\"\",\"type\":\"uint16\"}],\"name\":\"gameQuotas\",\"outputs\":[{\"components\":[{\"internalType\":\"uint16\",\"name\":\"one\",\"type\":\"uint16\"},{\"internalType\":\"uint16\",\"name\":\"two\",\"type\":\"uint16\"},{\"internalType\":\"uint16\",\"name\":\"x\",\"type\":\"uint16\"}],\"internalType\":\"struct Quotas\",\"name\":\"\",\"type\":\"tuple\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"uint16\",\"name\":\"\",\"type\":\"uint16\"}],\"name\":\"gameScores\",\"outputs\":[{\"components\":[{\"internalType\":\"uint8\",\"name\":\"home\",\"type\":\"uint8\"},{\"internalType\":\"uint8\",\"name\":\"away\",\"type\":\"uint8\"}],\"internalType\":\"struct GameScore\",\"name\":\"\",\"type\":\"tuple\"}],\"stateMutability\":\"view\",\"type\":\"function\"}],\"devdoc\":{\"kind\":\"dev\",\"methods\":{},\"version\":1},\"userdoc\":{\"kind\":\"user\",\"methods\":{},\"version\":1}},\"settings\":{\"compilationTarget\":{\"/home/antolovic/Master/BlokLanacBet/DAppContracts/contracts/BlokLanacBet.sol\":\"IBookmaker\"},\"evmVersion\":\"berlin\",\"libraries\":{},\"metadata\":{\"bytecodeHash\":\"ipfs\"},\"optimizer\":{\"enabled\":false,\"runs\":200},\"remappings\":[]},\"sources\":{\"/home/antolovic/Master/BlokLanacBet/DAppContracts/contracts/BlokLanacBet.sol\":{\"keccak256\":\"0xf3c71aad148cb44607cf0bde5517c081a9f7c086b23983c5b73ebb18405998a0\",\"urls\":[\"bzz-raw://4b5dfdab0cc68e9492ceae52b5c9c9e4d898475c604c4201e3b0423e89c3cf15\",\"dweb:/ipfs/QmUQqsPx5xmwJAAhpnQVwe1W2Mt4N3uvuDsXaEiTYdYEfz\"]}},\"version\":1}",
+  "metadata": "{\"compiler\":{\"version\":\"0.8.6+commit.11564f7e\"},\"language\":\"Solidity\",\"output\":{\"abi\":[{\"inputs\":[{\"internalType\":\"uint16\",\"name\":\"\",\"type\":\"uint16\"}],\"name\":\"gameQuotas\",\"outputs\":[{\"components\":[{\"internalType\":\"uint16\",\"name\":\"one\",\"type\":\"uint16\"},{\"internalType\":\"uint16\",\"name\":\"two\",\"type\":\"uint16\"},{\"internalType\":\"uint16\",\"name\":\"x\",\"type\":\"uint16\"}],\"internalType\":\"struct Quotas\",\"name\":\"\",\"type\":\"tuple\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"uint16\",\"name\":\"\",\"type\":\"uint16\"}],\"name\":\"gameScores\",\"outputs\":[{\"components\":[{\"internalType\":\"uint8\",\"name\":\"home\",\"type\":\"uint8\"},{\"internalType\":\"uint8\",\"name\":\"away\",\"type\":\"uint8\"}],\"internalType\":\"struct GameScore\",\"name\":\"\",\"type\":\"tuple\"}],\"stateMutability\":\"view\",\"type\":\"function\"}],\"devdoc\":{\"kind\":\"dev\",\"methods\":{},\"version\":1},\"userdoc\":{\"kind\":\"user\",\"methods\":{},\"version\":1}},\"settings\":{\"compilationTarget\":{\"/home/antolovic/Master/BlokLanacBet/DAppContracts/contracts/BlokLanacBet.sol\":\"IBookmaker\"},\"evmVersion\":\"berlin\",\"libraries\":{},\"metadata\":{\"bytecodeHash\":\"ipfs\"},\"optimizer\":{\"enabled\":false,\"runs\":200},\"remappings\":[]},\"sources\":{\"/home/antolovic/Master/BlokLanacBet/DAppContracts/contracts/BlokLanacBet.sol\":{\"keccak256\":\"0xe32be05f536cb5870dadf360a25320fe308e2e9a229e8af699213c1adfaf98ec\",\"urls\":[\"bzz-raw://d23bc49f8dc7415bd1c621a8ed21acd910a218fc4a684659412dfb3dc656d6f7\",\"dweb:/ipfs/QmTJ8w6cveyC7QnHFrL1zDs6LdczWXgNi8oXEeLk7fVGvM\"]}},\"version\":1}",
   "bytecode": "0x",
   "deployedBytecode": "0x",
   "immutableReferences": {},
@@ -77,7 +77,7 @@
   "deployedGeneratedSources": [],
   "sourceMap": "",
   "deployedSourceMap": "",
-  "source": "pragma solidity ^0.8.6;\n\nstruct Quotas {\n    uint16 one;\n    uint16 two;\n    uint16 x;\n}\nstruct GameScore {\n    uint8 home;\n    uint8 away;\n}\nstruct Bet {\n    uint16[] games;\n    uint8[] bets;\n    uint8 status;\n    uint256 amount;\n}\n\ncontract BlokLanacBet {\n    address private bookmakerContract;\n    mapping(address => Bet) private bets;\n    address payable public owner;\n    event DepositWinningBet(\n        address gambler,\n        uint256 _amount,\n        uint256 indexed externalBetId\n    );\n\n    constructor(address _bookmakerContract) {\n        owner = payable(msg.sender);\n        bookmakerContract = _bookmakerContract;\n    }\n\n    function makeBet(address gambler, Bet calldata bet) external payable {\n        require(msg.value > 0 && msg.value == bet.amount && bet.status == 0);\n        bets[gambler] = bet;\n    }\n\n    function processBetResult(address gambler, uint256 externalBetId)\n        external\n        returns (uint256)\n    {\n        Bet storage bet = bets[gambler];\n        uint256 amount = 0;\n        if (bet.status == 0) {\n            IBookmaker bookmaker = IBookmaker(bookmakerContract);\n            bool isWinningBet = true;\n            for (uint256 i = 0; i < bet.games.length; i++) {\n                uint8 gameBet = bet.bets[i];\n                uint16 game = bet.games[i];\n                GameScore memory gameScore = bookmaker.gameScores(game);\n                if (gameBet == 1) {\n                    if (gameScore.home > gameScore.away) continue;\n                    else {\n                        isWinningBet = false;\n                        break;\n                    }\n                } else if (gameBet == 2) {\n                    if (gameScore.home < gameScore.away) continue;\n                    else {\n                        isWinningBet = false;\n                        break;\n                    }\n                } else {\n                    if (gameScore.home == gameScore.away) continue;\n                    else {\n                        isWinningBet = false;\n                        break;\n                    }\n                }\n            }\n            bet.status = 1;\n            if (isWinningBet) {\n                amount = calculateAmount(bet);\n                address payable _to = payable(gambler);\n                (bool sent, bytes memory data) = _to.call{value: amount}(\"\");\n                require(sent, \"Failed to send Ether\");\n                bet.status = 2;\n                emit DepositWinningBet(gambler, amount, externalBetId);\n            }\n        }\n        return amount;\n    }\n\n    function calculateAmount(Bet storage bet) private view returns (uint256) {\n        IBookmaker bookmaker = IBookmaker(bookmakerContract);\n        uint16[] storage games = bet.games;\n        uint8[] storage bets = bet.bets;\n        uint256 result = bet.amount;\n        for (uint256 i = 0; i < games.length; i++) {\n            Quotas memory quotas = bookmaker.gameQuotas(games[i]);\n            uint16 quota = 1;\n            if (bets[i] == 1) {\n                quota = quotas.one;\n            } else if (bets[i] == 2) {\n                quota = quotas.two;\n            } else {\n                quota = quotas.x;\n            }\n            result *= quota;\n        }\n        result = result / 10**(games.length * 2);\n        return result;\n    }\n}\n\ninterface IBookmaker {\n    function gameScores(uint16) external view returns (GameScore memory);\n\n    function gameQuotas(uint16) external view returns (Quotas memory);\n}\n",
+  "source": "pragma solidity ^0.8.6;\n\nstruct Quotas {\n    uint16 one;\n    uint16 two;\n    uint16 x;\n}\nstruct GameScore {\n    uint8 home;\n    uint8 away;\n}\nstruct Bet {\n    uint16[] games;\n    uint8[] bets;\n    uint8 status;\n    uint256 amount;\n}\n\ncontract BlokLanacBet {\n    address private bookmakerContract;\n    mapping(address => Bet) private bets;\n    address payable public owner;\n    event DepositWinningBet(\n        address gambler,\n        uint256 _amount,\n        uint256 indexed externalBetId\n    );\n\n    constructor(address _bookmakerContract) {\n        owner = payable(msg.sender);\n        bookmakerContract = _bookmakerContract;\n    }\n\n    function makeBet(address gambler, Bet calldata bet) external payable {\n        require(msg.value > 0 && msg.value == bet.amount && bet.status == 0);\n        bets[gambler] = bet;\n    }\n\n    function processBetResult(address gambler, uint256 externalBetId)\n        external\n        returns (uint256)\n    {\n        Bet storage bet = bets[gambler];\n        uint256 amount = 0;\n        if (bet.status == 0) {\n            IBookmaker bookmaker = IBookmaker(bookmakerContract);\n            bool isWinningBet = true;\n            for (uint256 i = 0; i < bet.games.length; i++) {\n                uint8 gameBet = bet.bets[i];\n                uint16 game = bet.games[i];\n                GameScore memory gameScore = bookmaker.gameScores(game);\n                if (gameBet == 1) {\n                    if (gameScore.home > gameScore.away) continue;\n                    else {\n                        isWinningBet = false;\n                        break;\n                    }\n                } else if (gameBet == 2) {\n                    if (gameScore.home < gameScore.away) continue;\n                    else {\n                        isWinningBet = false;\n                        break;\n                    }\n                } else {\n                    if (gameScore.home == gameScore.away) continue;\n                    else {\n                        isWinningBet = false;\n                        break;\n                    }\n                }\n            }\n            bet.status = 1;\n            if (isWinningBet) {\n                amount = calculateAmount(bet);\n                address payable _to = payable(gambler);\n                (bool sent, bytes memory data) = _to.call{value: amount}(\"\");\n                require(sent, \"Failed to send Ether\");\n                bet.status = 2;\n                emit DepositWinningBet(gambler, amount, externalBetId);\n            }\n        }\n        return amount;\n    }\n\n    function calculateAmount(Bet storage bet) private view returns (uint256) {\n        IBookmaker bookmaker = IBookmaker(bookmakerContract);\n        uint16[] storage games = bet.games;\n        uint8[] storage bets = bet.bets;\n        uint256 result = bet.amount;\n        for (uint256 i = 0; i < games.length; i++) {\n            Quotas memory quotas = bookmaker.gameQuotas(games[i]);\n            uint16 quota = 1;\n            if (bets[i] == 1) {\n                quota = quotas.one;\n            } else if (bets[i] == 2) {\n                quota = quotas.two;\n            } else {\n                quota = quotas.x;\n            }\n            result *= quota;\n        }\n        result = result / 10**(games.length * 2);\n        return result;\n    }\n\n    receive() external payable {\n        require(msg.sender==owner);\n    }\n}\n\ninterface IBookmaker {\n    function gameScores(uint16) external view returns (GameScore memory);\n\n    function gameQuotas(uint16) external view returns (Quotas memory);\n}\n",
   "sourcePath": "/home/antolovic/Master/BlokLanacBet/DAppContracts/contracts/BlokLanacBet.sol",
   "ast": {
     "absolutePath": "/home/antolovic/Master/BlokLanacBet/DAppContracts/contracts/BlokLanacBet.sol",
@@ -86,19 +86,19 @@
         24
       ],
       "BlokLanacBet": [
-        381
+        392
       ],
       "GameScore": [
         13
       ],
       "IBookmaker": [
-        398
+        409
       ],
       "Quotas": [
         8
       ]
     },
-    "id": 399,
+    "id": 410,
     "nodeType": "SourceUnit",
     "nodes": [
       {
@@ -201,7 +201,7 @@
         "name": "Quotas",
         "nameLocation": "32:6:0",
         "nodeType": "StructDefinition",
-        "scope": 399,
+        "scope": 410,
         "src": "25:63:0",
         "visibility": "public"
       },
@@ -267,7 +267,7 @@
         "name": "GameScore",
         "nameLocation": "96:9:0",
         "nodeType": "StructDefinition",
-        "scope": 399,
+        "scope": 410,
         "src": "89:52:0",
         "visibility": "public"
       },
@@ -405,7 +405,7 @@
         "name": "Bet",
         "nameLocation": "149:3:0",
         "nodeType": "StructDefinition",
-        "scope": 399,
+        "scope": 410,
         "src": "142:90:0",
         "visibility": "public"
       },
@@ -415,9 +415,9 @@
         "contractDependencies": [],
         "contractKind": "contract",
         "fullyImplemented": true,
-        "id": 381,
+        "id": 392,
         "linearizedBaseContracts": [
-          381
+          392
         ],
         "name": "BlokLanacBet",
         "nameLocation": "243:12:0",
@@ -430,7 +430,7 @@
             "name": "bookmakerContract",
             "nameLocation": "278:17:0",
             "nodeType": "VariableDeclaration",
-            "scope": 381,
+            "scope": 392,
             "src": "262:33:0",
             "stateVariable": true,
             "storageLocation": "default",
@@ -458,7 +458,7 @@
             "name": "bets",
             "nameLocation": "333:4:0",
             "nodeType": "VariableDeclaration",
-            "scope": 381,
+            "scope": 392,
             "src": "301:36:0",
             "stateVariable": true,
             "storageLocation": "default",
@@ -512,7 +512,7 @@
             "name": "owner",
             "nameLocation": "366:5:0",
             "nodeType": "VariableDeclaration",
-            "scope": 381,
+            "scope": 392,
             "src": "343:28:0",
             "stateVariable": true,
             "storageLocation": "default",
@@ -834,7 +834,7 @@
               "parameters": [],
               "src": "542:0:0"
             },
-            "scope": 381,
+            "scope": 392,
             "src": "502:132:0",
             "stateMutability": "nonpayable",
             "virtual": false,
@@ -1271,7 +1271,7 @@
               "parameters": [],
               "src": "709:0:0"
             },
-            "scope": 381,
+            "scope": 392,
             "src": "640:183:0",
             "stateMutability": "payable",
             "virtual": false,
@@ -1504,7 +1504,7 @@
                             "stateVariable": false,
                             "storageLocation": "default",
                             "typeDescriptions": {
-                              "typeIdentifier": "t_contract$_IBookmaker_$398",
+                              "typeIdentifier": "t_contract$_IBookmaker_$409",
                               "typeString": "contract IBookmaker"
                             },
                             "typeName": {
@@ -1514,13 +1514,13 @@
                                 "id": 116,
                                 "name": "IBookmaker",
                                 "nodeType": "IdentifierPath",
-                                "referencedDeclaration": 398,
+                                "referencedDeclaration": 409,
                                 "src": "1056:10:0"
                               },
-                              "referencedDeclaration": 398,
+                              "referencedDeclaration": 409,
                               "src": "1056:10:0",
                               "typeDescriptions": {
-                                "typeIdentifier": "t_contract$_IBookmaker_$398",
+                                "typeIdentifier": "t_contract$_IBookmaker_$409",
                                 "typeString": "contract IBookmaker"
                               }
                             },
@@ -1554,10 +1554,10 @@
                             "name": "IBookmaker",
                             "nodeType": "Identifier",
                             "overloadedDeclarations": [],
-                            "referencedDeclaration": 398,
+                            "referencedDeclaration": 409,
                             "src": "1079:10:0",
                             "typeDescriptions": {
-                              "typeIdentifier": "t_type$_t_contract$_IBookmaker_$398_$",
+                              "typeIdentifier": "t_type$_t_contract$_IBookmaker_$409_$",
                               "typeString": "type(contract IBookmaker)"
                             }
                           },
@@ -1572,7 +1572,7 @@
                           "src": "1079:29:0",
                           "tryCall": false,
                           "typeDescriptions": {
-                            "typeIdentifier": "t_contract$_IBookmaker_$398",
+                            "typeIdentifier": "t_contract$_IBookmaker_$409",
                             "typeString": "contract IBookmaker"
                           }
                         },
@@ -1887,7 +1887,7 @@
                                     "referencedDeclaration": 118,
                                     "src": "1343:9:0",
                                     "typeDescriptions": {
-                                      "typeIdentifier": "t_contract$_IBookmaker_$398",
+                                      "typeIdentifier": "t_contract$_IBookmaker_$409",
                                       "typeString": "contract IBookmaker"
                                     }
                                   },
@@ -1898,7 +1898,7 @@
                                   "lValueRequested": false,
                                   "memberName": "gameScores",
                                   "nodeType": "MemberAccess",
-                                  "referencedDeclaration": 389,
+                                  "referencedDeclaration": 400,
                                   "src": "1343:20:0",
                                   "typeDescriptions": {
                                     "typeIdentifier": "t_function_external_view$_t_uint16_$returns$_t_struct$_GameScore_$13_memory_ptr_$",
@@ -3408,7 +3408,7 @@
               ],
               "src": "928:9:0"
             },
-            "scope": 381,
+            "scope": 392,
             "src": "829:1710:0",
             "stateMutability": "nonpayable",
             "virtual": false,
@@ -3437,7 +3437,7 @@
                       "stateVariable": false,
                       "storageLocation": "default",
                       "typeDescriptions": {
-                        "typeIdentifier": "t_contract$_IBookmaker_$398",
+                        "typeIdentifier": "t_contract$_IBookmaker_$409",
                         "typeString": "contract IBookmaker"
                       },
                       "typeName": {
@@ -3447,13 +3447,13 @@
                           "id": 276,
                           "name": "IBookmaker",
                           "nodeType": "IdentifierPath",
-                          "referencedDeclaration": 398,
+                          "referencedDeclaration": 409,
                           "src": "2628:10:0"
                         },
-                        "referencedDeclaration": 398,
+                        "referencedDeclaration": 409,
                         "src": "2628:10:0",
                         "typeDescriptions": {
-                          "typeIdentifier": "t_contract$_IBookmaker_$398",
+                          "typeIdentifier": "t_contract$_IBookmaker_$409",
                           "typeString": "contract IBookmaker"
                         }
                       },
@@ -3487,10 +3487,10 @@
                       "name": "IBookmaker",
                       "nodeType": "Identifier",
                       "overloadedDeclarations": [],
-                      "referencedDeclaration": 398,
+                      "referencedDeclaration": 409,
                       "src": "2651:10:0",
                       "typeDescriptions": {
-                        "typeIdentifier": "t_type$_t_contract$_IBookmaker_$398_$",
+                        "typeIdentifier": "t_type$_t_contract$_IBookmaker_$409_$",
                         "typeString": "type(contract IBookmaker)"
                       }
                     },
@@ -3505,7 +3505,7 @@
                     "src": "2651:29:0",
                     "tryCall": false,
                     "typeDescriptions": {
-                      "typeIdentifier": "t_contract$_IBookmaker_$398",
+                      "typeIdentifier": "t_contract$_IBookmaker_$409",
                       "typeString": "contract IBookmaker"
                     }
                   },
@@ -3824,7 +3824,7 @@
                               "referencedDeclaration": 278,
                               "src": "2892:9:0",
                               "typeDescriptions": {
-                                "typeIdentifier": "t_contract$_IBookmaker_$398",
+                                "typeIdentifier": "t_contract$_IBookmaker_$409",
                                 "typeString": "contract IBookmaker"
                               }
                             },
@@ -3835,7 +3835,7 @@
                             "lValueRequested": false,
                             "memberName": "gameQuotas",
                             "nodeType": "MemberAccess",
-                            "referencedDeclaration": 397,
+                            "referencedDeclaration": 408,
                             "src": "2892:20:0",
                             "typeDescriptions": {
                               "typeIdentifier": "t_function_external_view$_t_uint16_$returns$_t_struct$_Quotas_$8_memory_ptr_$",
@@ -4723,15 +4723,148 @@
               ],
               "src": "2608:9:0"
             },
-            "scope": 381,
+            "scope": 392,
             "src": "2545:738:0",
             "stateMutability": "view",
             "virtual": false,
             "visibility": "private"
+          },
+          {
+            "body": {
+              "id": 390,
+              "nodeType": "Block",
+              "src": "3316:43:0",
+              "statements": [
+                {
+                  "expression": {
+                    "arguments": [
+                      {
+                        "commonType": {
+                          "typeIdentifier": "t_address",
+                          "typeString": "address"
+                        },
+                        "id": 387,
+                        "isConstant": false,
+                        "isLValue": false,
+                        "isPure": false,
+                        "lValueRequested": false,
+                        "leftExpression": {
+                          "expression": {
+                            "id": 384,
+                            "name": "msg",
+                            "nodeType": "Identifier",
+                            "overloadedDeclarations": [],
+                            "referencedDeclaration": 4294967281,
+                            "src": "3334:3:0",
+                            "typeDescriptions": {
+                              "typeIdentifier": "t_magic_message",
+                              "typeString": "msg"
+                            }
+                          },
+                          "id": 385,
+                          "isConstant": false,
+                          "isLValue": false,
+                          "isPure": false,
+                          "lValueRequested": false,
+                          "memberName": "sender",
+                          "nodeType": "MemberAccess",
+                          "src": "3334:10:0",
+                          "typeDescriptions": {
+                            "typeIdentifier": "t_address",
+                            "typeString": "address"
+                          }
+                        },
+                        "nodeType": "BinaryOperation",
+                        "operator": "==",
+                        "rightExpression": {
+                          "id": 386,
+                          "name": "owner",
+                          "nodeType": "Identifier",
+                          "overloadedDeclarations": [],
+                          "referencedDeclaration": 33,
+                          "src": "3346:5:0",
+                          "typeDescriptions": {
+                            "typeIdentifier": "t_address_payable",
+                            "typeString": "address payable"
+                          }
+                        },
+                        "src": "3334:17:0",
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_bool",
+                          "typeString": "bool"
+                        }
+                      }
+                    ],
+                    "expression": {
+                      "argumentTypes": [
+                        {
+                          "typeIdentifier": "t_bool",
+                          "typeString": "bool"
+                        }
+                      ],
+                      "id": 383,
+                      "name": "require",
+                      "nodeType": "Identifier",
+                      "overloadedDeclarations": [
+                        4294967278,
+                        4294967278
+                      ],
+                      "referencedDeclaration": 4294967278,
+                      "src": "3326:7:0",
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_function_require_pure$_t_bool_$returns$__$",
+                        "typeString": "function (bool) pure"
+                      }
+                    },
+                    "id": 388,
+                    "isConstant": false,
+                    "isLValue": false,
+                    "isPure": false,
+                    "kind": "functionCall",
+                    "lValueRequested": false,
+                    "names": [],
+                    "nodeType": "FunctionCall",
+                    "src": "3326:26:0",
+                    "tryCall": false,
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_tuple$__$",
+                      "typeString": "tuple()"
+                    }
+                  },
+                  "id": 389,
+                  "nodeType": "ExpressionStatement",
+                  "src": "3326:26:0"
+                }
+              ]
+            },
+            "id": 391,
+            "implemented": true,
+            "kind": "receive",
+            "modifiers": [],
+            "name": "",
+            "nameLocation": "-1:-1:-1",
+            "nodeType": "FunctionDefinition",
+            "parameters": {
+              "id": 381,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "3296:2:0"
+            },
+            "returnParameters": {
+              "id": 382,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "3316:0:0"
+            },
+            "scope": 392,
+            "src": "3289:70:0",
+            "stateMutability": "payable",
+            "virtual": false,
+            "visibility": "external"
           }
         ],
-        "scope": 399,
-        "src": "234:3051:0",
+        "scope": 410,
+        "src": "234:3127:0",
         "usedErrors": []
       },
       {
@@ -4740,36 +4873,36 @@
         "contractDependencies": [],
         "contractKind": "interface",
         "fullyImplemented": false,
-        "id": 398,
+        "id": 409,
         "linearizedBaseContracts": [
-          398
+          409
         ],
         "name": "IBookmaker",
-        "nameLocation": "3297:10:0",
+        "nameLocation": "3373:10:0",
         "nodeType": "ContractDefinition",
         "nodes": [
           {
             "functionSelector": "302a7dbb",
-            "id": 389,
+            "id": 400,
             "implemented": false,
             "kind": "function",
             "modifiers": [],
             "name": "gameScores",
-            "nameLocation": "3323:10:0",
+            "nameLocation": "3399:10:0",
             "nodeType": "FunctionDefinition",
             "parameters": {
-              "id": 384,
+              "id": 395,
               "nodeType": "ParameterList",
               "parameters": [
                 {
                   "constant": false,
-                  "id": 383,
+                  "id": 394,
                   "mutability": "mutable",
                   "name": "",
                   "nameLocation": "-1:-1:-1",
                   "nodeType": "VariableDeclaration",
-                  "scope": 389,
-                  "src": "3334:6:0",
+                  "scope": 400,
+                  "src": "3410:6:0",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
@@ -4777,10 +4910,10 @@
                     "typeString": "uint16"
                   },
                   "typeName": {
-                    "id": 382,
+                    "id": 393,
                     "name": "uint16",
                     "nodeType": "ElementaryTypeName",
-                    "src": "3334:6:0",
+                    "src": "3410:6:0",
                     "typeDescriptions": {
                       "typeIdentifier": "t_uint16",
                       "typeString": "uint16"
@@ -4789,21 +4922,21 @@
                   "visibility": "internal"
                 }
               ],
-              "src": "3333:8:0"
+              "src": "3409:8:0"
             },
             "returnParameters": {
-              "id": 388,
+              "id": 399,
               "nodeType": "ParameterList",
               "parameters": [
                 {
                   "constant": false,
-                  "id": 387,
+                  "id": 398,
                   "mutability": "mutable",
                   "name": "",
                   "nameLocation": "-1:-1:-1",
                   "nodeType": "VariableDeclaration",
-                  "scope": 389,
-                  "src": "3365:16:0",
+                  "scope": 400,
+                  "src": "3441:16:0",
                   "stateVariable": false,
                   "storageLocation": "memory",
                   "typeDescriptions": {
@@ -4811,17 +4944,17 @@
                     "typeString": "struct GameScore"
                   },
                   "typeName": {
-                    "id": 386,
+                    "id": 397,
                     "nodeType": "UserDefinedTypeName",
                     "pathNode": {
-                      "id": 385,
+                      "id": 396,
                       "name": "GameScore",
                       "nodeType": "IdentifierPath",
                       "referencedDeclaration": 13,
-                      "src": "3365:9:0"
+                      "src": "3441:9:0"
                     },
                     "referencedDeclaration": 13,
-                    "src": "3365:9:0",
+                    "src": "3441:9:0",
                     "typeDescriptions": {
                       "typeIdentifier": "t_struct$_GameScore_$13_storage_ptr",
                       "typeString": "struct GameScore"
@@ -4830,36 +4963,36 @@
                   "visibility": "internal"
                 }
               ],
-              "src": "3364:18:0"
+              "src": "3440:18:0"
             },
-            "scope": 398,
-            "src": "3314:69:0",
+            "scope": 409,
+            "src": "3390:69:0",
             "stateMutability": "view",
             "virtual": false,
             "visibility": "external"
           },
           {
             "functionSelector": "4a1be812",
-            "id": 397,
+            "id": 408,
             "implemented": false,
             "kind": "function",
             "modifiers": [],
             "name": "gameQuotas",
-            "nameLocation": "3398:10:0",
+            "nameLocation": "3474:10:0",
             "nodeType": "FunctionDefinition",
             "parameters": {
-              "id": 392,
+              "id": 403,
               "nodeType": "ParameterList",
               "parameters": [
                 {
                   "constant": false,
-                  "id": 391,
+                  "id": 402,
                   "mutability": "mutable",
                   "name": "",
                   "nameLocation": "-1:-1:-1",
                   "nodeType": "VariableDeclaration",
-                  "scope": 397,
-                  "src": "3409:6:0",
+                  "scope": 408,
+                  "src": "3485:6:0",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
@@ -4867,10 +5000,10 @@
                     "typeString": "uint16"
                   },
                   "typeName": {
-                    "id": 390,
+                    "id": 401,
                     "name": "uint16",
                     "nodeType": "ElementaryTypeName",
-                    "src": "3409:6:0",
+                    "src": "3485:6:0",
                     "typeDescriptions": {
                       "typeIdentifier": "t_uint16",
                       "typeString": "uint16"
@@ -4879,21 +5012,21 @@
                   "visibility": "internal"
                 }
               ],
-              "src": "3408:8:0"
+              "src": "3484:8:0"
             },
             "returnParameters": {
-              "id": 396,
+              "id": 407,
               "nodeType": "ParameterList",
               "parameters": [
                 {
                   "constant": false,
-                  "id": 395,
+                  "id": 406,
                   "mutability": "mutable",
                   "name": "",
                   "nameLocation": "-1:-1:-1",
                   "nodeType": "VariableDeclaration",
-                  "scope": 397,
-                  "src": "3440:13:0",
+                  "scope": 408,
+                  "src": "3516:13:0",
                   "stateVariable": false,
                   "storageLocation": "memory",
                   "typeDescriptions": {
@@ -4901,17 +5034,17 @@
                     "typeString": "struct Quotas"
                   },
                   "typeName": {
-                    "id": 394,
+                    "id": 405,
                     "nodeType": "UserDefinedTypeName",
                     "pathNode": {
-                      "id": 393,
+                      "id": 404,
                       "name": "Quotas",
                       "nodeType": "IdentifierPath",
                       "referencedDeclaration": 8,
-                      "src": "3440:6:0"
+                      "src": "3516:6:0"
                     },
                     "referencedDeclaration": 8,
-                    "src": "3440:6:0",
+                    "src": "3516:6:0",
                     "typeDescriptions": {
                       "typeIdentifier": "t_struct$_Quotas_$8_storage_ptr",
                       "typeString": "struct Quotas"
@@ -4920,21 +5053,21 @@
                   "visibility": "internal"
                 }
               ],
-              "src": "3439:15:0"
+              "src": "3515:15:0"
             },
-            "scope": 398,
-            "src": "3389:66:0",
+            "scope": 409,
+            "src": "3465:66:0",
             "stateMutability": "view",
             "virtual": false,
             "visibility": "external"
           }
         ],
-        "scope": 399,
-        "src": "3287:170:0",
+        "scope": 410,
+        "src": "3363:170:0",
         "usedErrors": []
       }
     ],
-    "src": "0:3458:0"
+    "src": "0:3534:0"
   },
   "legacyAST": {
     "absolutePath": "/home/antolovic/Master/BlokLanacBet/DAppContracts/contracts/BlokLanacBet.sol",
@@ -4943,19 +5076,19 @@
         24
       ],
       "BlokLanacBet": [
-        381
+        392
       ],
       "GameScore": [
         13
       ],
       "IBookmaker": [
-        398
+        409
       ],
       "Quotas": [
         8
       ]
     },
-    "id": 399,
+    "id": 410,
     "nodeType": "SourceUnit",
     "nodes": [
       {
@@ -5058,7 +5191,7 @@
         "name": "Quotas",
         "nameLocation": "32:6:0",
         "nodeType": "StructDefinition",
-        "scope": 399,
+        "scope": 410,
         "src": "25:63:0",
         "visibility": "public"
       },
@@ -5124,7 +5257,7 @@
         "name": "GameScore",
         "nameLocation": "96:9:0",
         "nodeType": "StructDefinition",
-        "scope": 399,
+        "scope": 410,
         "src": "89:52:0",
         "visibility": "public"
       },
@@ -5262,7 +5395,7 @@
         "name": "Bet",
         "nameLocation": "149:3:0",
         "nodeType": "StructDefinition",
-        "scope": 399,
+        "scope": 410,
         "src": "142:90:0",
         "visibility": "public"
       },
@@ -5272,9 +5405,9 @@
         "contractDependencies": [],
         "contractKind": "contract",
         "fullyImplemented": true,
-        "id": 381,
+        "id": 392,
         "linearizedBaseContracts": [
-          381
+          392
         ],
         "name": "BlokLanacBet",
         "nameLocation": "243:12:0",
@@ -5287,7 +5420,7 @@
             "name": "bookmakerContract",
             "nameLocation": "278:17:0",
             "nodeType": "VariableDeclaration",
-            "scope": 381,
+            "scope": 392,
             "src": "262:33:0",
             "stateVariable": true,
             "storageLocation": "default",
@@ -5315,7 +5448,7 @@
             "name": "bets",
             "nameLocation": "333:4:0",
             "nodeType": "VariableDeclaration",
-            "scope": 381,
+            "scope": 392,
             "src": "301:36:0",
             "stateVariable": true,
             "storageLocation": "default",
@@ -5369,7 +5502,7 @@
             "name": "owner",
             "nameLocation": "366:5:0",
             "nodeType": "VariableDeclaration",
-            "scope": 381,
+            "scope": 392,
             "src": "343:28:0",
             "stateVariable": true,
             "storageLocation": "default",
@@ -5691,7 +5824,7 @@
               "parameters": [],
               "src": "542:0:0"
             },
-            "scope": 381,
+            "scope": 392,
             "src": "502:132:0",
             "stateMutability": "nonpayable",
             "virtual": false,
@@ -6128,7 +6261,7 @@
               "parameters": [],
               "src": "709:0:0"
             },
-            "scope": 381,
+            "scope": 392,
             "src": "640:183:0",
             "stateMutability": "payable",
             "virtual": false,
@@ -6361,7 +6494,7 @@
                             "stateVariable": false,
                             "storageLocation": "default",
                             "typeDescriptions": {
-                              "typeIdentifier": "t_contract$_IBookmaker_$398",
+                              "typeIdentifier": "t_contract$_IBookmaker_$409",
                               "typeString": "contract IBookmaker"
                             },
                             "typeName": {
@@ -6371,13 +6504,13 @@
                                 "id": 116,
                                 "name": "IBookmaker",
                                 "nodeType": "IdentifierPath",
-                                "referencedDeclaration": 398,
+                                "referencedDeclaration": 409,
                                 "src": "1056:10:0"
                               },
-                              "referencedDeclaration": 398,
+                              "referencedDeclaration": 409,
                               "src": "1056:10:0",
                               "typeDescriptions": {
-                                "typeIdentifier": "t_contract$_IBookmaker_$398",
+                                "typeIdentifier": "t_contract$_IBookmaker_$409",
                                 "typeString": "contract IBookmaker"
                               }
                             },
@@ -6411,10 +6544,10 @@
                             "name": "IBookmaker",
                             "nodeType": "Identifier",
                             "overloadedDeclarations": [],
-                            "referencedDeclaration": 398,
+                            "referencedDeclaration": 409,
                             "src": "1079:10:0",
                             "typeDescriptions": {
-                              "typeIdentifier": "t_type$_t_contract$_IBookmaker_$398_$",
+                              "typeIdentifier": "t_type$_t_contract$_IBookmaker_$409_$",
                               "typeString": "type(contract IBookmaker)"
                             }
                           },
@@ -6429,7 +6562,7 @@
                           "src": "1079:29:0",
                           "tryCall": false,
                           "typeDescriptions": {
-                            "typeIdentifier": "t_contract$_IBookmaker_$398",
+                            "typeIdentifier": "t_contract$_IBookmaker_$409",
                             "typeString": "contract IBookmaker"
                           }
                         },
@@ -6744,7 +6877,7 @@
                                     "referencedDeclaration": 118,
                                     "src": "1343:9:0",
                                     "typeDescriptions": {
-                                      "typeIdentifier": "t_contract$_IBookmaker_$398",
+                                      "typeIdentifier": "t_contract$_IBookmaker_$409",
                                       "typeString": "contract IBookmaker"
                                     }
                                   },
@@ -6755,7 +6888,7 @@
                                   "lValueRequested": false,
                                   "memberName": "gameScores",
                                   "nodeType": "MemberAccess",
-                                  "referencedDeclaration": 389,
+                                  "referencedDeclaration": 400,
                                   "src": "1343:20:0",
                                   "typeDescriptions": {
                                     "typeIdentifier": "t_function_external_view$_t_uint16_$returns$_t_struct$_GameScore_$13_memory_ptr_$",
@@ -8265,7 +8398,7 @@
               ],
               "src": "928:9:0"
             },
-            "scope": 381,
+            "scope": 392,
             "src": "829:1710:0",
             "stateMutability": "nonpayable",
             "virtual": false,
@@ -8294,7 +8427,7 @@
                       "stateVariable": false,
                       "storageLocation": "default",
                       "typeDescriptions": {
-                        "typeIdentifier": "t_contract$_IBookmaker_$398",
+                        "typeIdentifier": "t_contract$_IBookmaker_$409",
                         "typeString": "contract IBookmaker"
                       },
                       "typeName": {
@@ -8304,13 +8437,13 @@
                           "id": 276,
                           "name": "IBookmaker",
                           "nodeType": "IdentifierPath",
-                          "referencedDeclaration": 398,
+                          "referencedDeclaration": 409,
                           "src": "2628:10:0"
                         },
-                        "referencedDeclaration": 398,
+                        "referencedDeclaration": 409,
                         "src": "2628:10:0",
                         "typeDescriptions": {
-                          "typeIdentifier": "t_contract$_IBookmaker_$398",
+                          "typeIdentifier": "t_contract$_IBookmaker_$409",
                           "typeString": "contract IBookmaker"
                         }
                       },
@@ -8344,10 +8477,10 @@
                       "name": "IBookmaker",
                       "nodeType": "Identifier",
                       "overloadedDeclarations": [],
-                      "referencedDeclaration": 398,
+                      "referencedDeclaration": 409,
                       "src": "2651:10:0",
                       "typeDescriptions": {
-                        "typeIdentifier": "t_type$_t_contract$_IBookmaker_$398_$",
+                        "typeIdentifier": "t_type$_t_contract$_IBookmaker_$409_$",
                         "typeString": "type(contract IBookmaker)"
                       }
                     },
@@ -8362,7 +8495,7 @@
                     "src": "2651:29:0",
                     "tryCall": false,
                     "typeDescriptions": {
-                      "typeIdentifier": "t_contract$_IBookmaker_$398",
+                      "typeIdentifier": "t_contract$_IBookmaker_$409",
                       "typeString": "contract IBookmaker"
                     }
                   },
@@ -8681,7 +8814,7 @@
                               "referencedDeclaration": 278,
                               "src": "2892:9:0",
                               "typeDescriptions": {
-                                "typeIdentifier": "t_contract$_IBookmaker_$398",
+                                "typeIdentifier": "t_contract$_IBookmaker_$409",
                                 "typeString": "contract IBookmaker"
                               }
                             },
@@ -8692,7 +8825,7 @@
                             "lValueRequested": false,
                             "memberName": "gameQuotas",
                             "nodeType": "MemberAccess",
-                            "referencedDeclaration": 397,
+                            "referencedDeclaration": 408,
                             "src": "2892:20:0",
                             "typeDescriptions": {
                               "typeIdentifier": "t_function_external_view$_t_uint16_$returns$_t_struct$_Quotas_$8_memory_ptr_$",
@@ -9580,15 +9713,148 @@
               ],
               "src": "2608:9:0"
             },
-            "scope": 381,
+            "scope": 392,
             "src": "2545:738:0",
             "stateMutability": "view",
             "virtual": false,
             "visibility": "private"
+          },
+          {
+            "body": {
+              "id": 390,
+              "nodeType": "Block",
+              "src": "3316:43:0",
+              "statements": [
+                {
+                  "expression": {
+                    "arguments": [
+                      {
+                        "commonType": {
+                          "typeIdentifier": "t_address",
+                          "typeString": "address"
+                        },
+                        "id": 387,
+                        "isConstant": false,
+                        "isLValue": false,
+                        "isPure": false,
+                        "lValueRequested": false,
+                        "leftExpression": {
+                          "expression": {
+                            "id": 384,
+                            "name": "msg",
+                            "nodeType": "Identifier",
+                            "overloadedDeclarations": [],
+                            "referencedDeclaration": 4294967281,
+                            "src": "3334:3:0",
+                            "typeDescriptions": {
+                              "typeIdentifier": "t_magic_message",
+                              "typeString": "msg"
+                            }
+                          },
+                          "id": 385,
+                          "isConstant": false,
+                          "isLValue": false,
+                          "isPure": false,
+                          "lValueRequested": false,
+                          "memberName": "sender",
+                          "nodeType": "MemberAccess",
+                          "src": "3334:10:0",
+                          "typeDescriptions": {
+                            "typeIdentifier": "t_address",
+                            "typeString": "address"
+                          }
+                        },
+                        "nodeType": "BinaryOperation",
+                        "operator": "==",
+                        "rightExpression": {
+                          "id": 386,
+                          "name": "owner",
+                          "nodeType": "Identifier",
+                          "overloadedDeclarations": [],
+                          "referencedDeclaration": 33,
+                          "src": "3346:5:0",
+                          "typeDescriptions": {
+                            "typeIdentifier": "t_address_payable",
+                            "typeString": "address payable"
+                          }
+                        },
+                        "src": "3334:17:0",
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_bool",
+                          "typeString": "bool"
+                        }
+                      }
+                    ],
+                    "expression": {
+                      "argumentTypes": [
+                        {
+                          "typeIdentifier": "t_bool",
+                          "typeString": "bool"
+                        }
+                      ],
+                      "id": 383,
+                      "name": "require",
+                      "nodeType": "Identifier",
+                      "overloadedDeclarations": [
+                        4294967278,
+                        4294967278
+                      ],
+                      "referencedDeclaration": 4294967278,
+                      "src": "3326:7:0",
+                      "typeDescriptions": {
+                        "typeIdentifier": "t_function_require_pure$_t_bool_$returns$__$",
+                        "typeString": "function (bool) pure"
+                      }
+                    },
+                    "id": 388,
+                    "isConstant": false,
+                    "isLValue": false,
+                    "isPure": false,
+                    "kind": "functionCall",
+                    "lValueRequested": false,
+                    "names": [],
+                    "nodeType": "FunctionCall",
+                    "src": "3326:26:0",
+                    "tryCall": false,
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_tuple$__$",
+                      "typeString": "tuple()"
+                    }
+                  },
+                  "id": 389,
+                  "nodeType": "ExpressionStatement",
+                  "src": "3326:26:0"
+                }
+              ]
+            },
+            "id": 391,
+            "implemented": true,
+            "kind": "receive",
+            "modifiers": [],
+            "name": "",
+            "nameLocation": "-1:-1:-1",
+            "nodeType": "FunctionDefinition",
+            "parameters": {
+              "id": 381,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "3296:2:0"
+            },
+            "returnParameters": {
+              "id": 382,
+              "nodeType": "ParameterList",
+              "parameters": [],
+              "src": "3316:0:0"
+            },
+            "scope": 392,
+            "src": "3289:70:0",
+            "stateMutability": "payable",
+            "virtual": false,
+            "visibility": "external"
           }
         ],
-        "scope": 399,
-        "src": "234:3051:0",
+        "scope": 410,
+        "src": "234:3127:0",
         "usedErrors": []
       },
       {
@@ -9597,36 +9863,36 @@
         "contractDependencies": [],
         "contractKind": "interface",
         "fullyImplemented": false,
-        "id": 398,
+        "id": 409,
         "linearizedBaseContracts": [
-          398
+          409
         ],
         "name": "IBookmaker",
-        "nameLocation": "3297:10:0",
+        "nameLocation": "3373:10:0",
         "nodeType": "ContractDefinition",
         "nodes": [
           {
             "functionSelector": "302a7dbb",
-            "id": 389,
+            "id": 400,
             "implemented": false,
             "kind": "function",
             "modifiers": [],
             "name": "gameScores",
-            "nameLocation": "3323:10:0",
+            "nameLocation": "3399:10:0",
             "nodeType": "FunctionDefinition",
             "parameters": {
-              "id": 384,
+              "id": 395,
               "nodeType": "ParameterList",
               "parameters": [
                 {
                   "constant": false,
-                  "id": 383,
+                  "id": 394,
                   "mutability": "mutable",
                   "name": "",
                   "nameLocation": "-1:-1:-1",
                   "nodeType": "VariableDeclaration",
-                  "scope": 389,
-                  "src": "3334:6:0",
+                  "scope": 400,
+                  "src": "3410:6:0",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
@@ -9634,10 +9900,10 @@
                     "typeString": "uint16"
                   },
                   "typeName": {
-                    "id": 382,
+                    "id": 393,
                     "name": "uint16",
                     "nodeType": "ElementaryTypeName",
-                    "src": "3334:6:0",
+                    "src": "3410:6:0",
                     "typeDescriptions": {
                       "typeIdentifier": "t_uint16",
                       "typeString": "uint16"
@@ -9646,21 +9912,21 @@
                   "visibility": "internal"
                 }
               ],
-              "src": "3333:8:0"
+              "src": "3409:8:0"
             },
             "returnParameters": {
-              "id": 388,
+              "id": 399,
               "nodeType": "ParameterList",
               "parameters": [
                 {
                   "constant": false,
-                  "id": 387,
+                  "id": 398,
                   "mutability": "mutable",
                   "name": "",
                   "nameLocation": "-1:-1:-1",
                   "nodeType": "VariableDeclaration",
-                  "scope": 389,
-                  "src": "3365:16:0",
+                  "scope": 400,
+                  "src": "3441:16:0",
                   "stateVariable": false,
                   "storageLocation": "memory",
                   "typeDescriptions": {
@@ -9668,17 +9934,17 @@
                     "typeString": "struct GameScore"
                   },
                   "typeName": {
-                    "id": 386,
+                    "id": 397,
                     "nodeType": "UserDefinedTypeName",
                     "pathNode": {
-                      "id": 385,
+                      "id": 396,
                       "name": "GameScore",
                       "nodeType": "IdentifierPath",
                       "referencedDeclaration": 13,
-                      "src": "3365:9:0"
+                      "src": "3441:9:0"
                     },
                     "referencedDeclaration": 13,
-                    "src": "3365:9:0",
+                    "src": "3441:9:0",
                     "typeDescriptions": {
                       "typeIdentifier": "t_struct$_GameScore_$13_storage_ptr",
                       "typeString": "struct GameScore"
@@ -9687,36 +9953,36 @@
                   "visibility": "internal"
                 }
               ],
-              "src": "3364:18:0"
+              "src": "3440:18:0"
             },
-            "scope": 398,
-            "src": "3314:69:0",
+            "scope": 409,
+            "src": "3390:69:0",
             "stateMutability": "view",
             "virtual": false,
             "visibility": "external"
           },
           {
             "functionSelector": "4a1be812",
-            "id": 397,
+            "id": 408,
             "implemented": false,
             "kind": "function",
             "modifiers": [],
             "name": "gameQuotas",
-            "nameLocation": "3398:10:0",
+            "nameLocation": "3474:10:0",
             "nodeType": "FunctionDefinition",
             "parameters": {
-              "id": 392,
+              "id": 403,
               "nodeType": "ParameterList",
               "parameters": [
                 {
                   "constant": false,
-                  "id": 391,
+                  "id": 402,
                   "mutability": "mutable",
                   "name": "",
                   "nameLocation": "-1:-1:-1",
                   "nodeType": "VariableDeclaration",
-                  "scope": 397,
-                  "src": "3409:6:0",
+                  "scope": 408,
+                  "src": "3485:6:0",
                   "stateVariable": false,
                   "storageLocation": "default",
                   "typeDescriptions": {
@@ -9724,10 +9990,10 @@
                     "typeString": "uint16"
                   },
                   "typeName": {
-                    "id": 390,
+                    "id": 401,
                     "name": "uint16",
                     "nodeType": "ElementaryTypeName",
-                    "src": "3409:6:0",
+                    "src": "3485:6:0",
                     "typeDescriptions": {
                       "typeIdentifier": "t_uint16",
                       "typeString": "uint16"
@@ -9736,21 +10002,21 @@
                   "visibility": "internal"
                 }
               ],
-              "src": "3408:8:0"
+              "src": "3484:8:0"
             },
             "returnParameters": {
-              "id": 396,
+              "id": 407,
               "nodeType": "ParameterList",
               "parameters": [
                 {
                   "constant": false,
-                  "id": 395,
+                  "id": 406,
                   "mutability": "mutable",
                   "name": "",
                   "nameLocation": "-1:-1:-1",
                   "nodeType": "VariableDeclaration",
-                  "scope": 397,
-                  "src": "3440:13:0",
+                  "scope": 408,
+                  "src": "3516:13:0",
                   "stateVariable": false,
                   "storageLocation": "memory",
                   "typeDescriptions": {
@@ -9758,17 +10024,17 @@
                     "typeString": "struct Quotas"
                   },
                   "typeName": {
-                    "id": 394,
+                    "id": 405,
                     "nodeType": "UserDefinedTypeName",
                     "pathNode": {
-                      "id": 393,
+                      "id": 404,
                       "name": "Quotas",
                       "nodeType": "IdentifierPath",
                       "referencedDeclaration": 8,
-                      "src": "3440:6:0"
+                      "src": "3516:6:0"
                     },
                     "referencedDeclaration": 8,
-                    "src": "3440:6:0",
+                    "src": "3516:6:0",
                     "typeDescriptions": {
                       "typeIdentifier": "t_struct$_Quotas_$8_storage_ptr",
                       "typeString": "struct Quotas"
@@ -9777,21 +10043,21 @@
                   "visibility": "internal"
                 }
               ],
-              "src": "3439:15:0"
+              "src": "3515:15:0"
             },
-            "scope": 398,
-            "src": "3389:66:0",
+            "scope": 409,
+            "src": "3465:66:0",
             "stateMutability": "view",
             "virtual": false,
             "visibility": "external"
           }
         ],
-        "scope": 399,
-        "src": "3287:170:0",
+        "scope": 410,
+        "src": "3363:170:0",
         "usedErrors": []
       }
     ],
-    "src": "0:3458:0"
+    "src": "0:3534:0"
   },
   "compiler": {
     "name": "solc",
@@ -9799,7 +10065,7 @@
   },
   "networks": {},
   "schemaVersion": "3.3.4",
-  "updatedAt": "2021-09-06T22:56:53.460Z",
+  "updatedAt": "2021-09-07T18:53:09.691Z",
   "devdoc": {
     "kind": "dev",
     "methods": {},
