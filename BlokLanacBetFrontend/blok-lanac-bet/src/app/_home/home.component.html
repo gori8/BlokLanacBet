@@ -6,7 +6,9 @@
       </button>
       {{ game.hTeam.fullName }}</mat-card
     >
-    <mat-card class="scores-card">{{ game.simple_score }}</mat-card>
+    <mat-card class="scores-card"
+      >{{ game.hTeam.score.points }} - {{ game.vTeam.score.points }}</mat-card
+    >
     <mat-card
       >{{ game.vTeam.fullName }}
       <button mat-button disabled>
@@ -18,19 +20,46 @@
       mat-raised-button
       color="primary"
       class="button-ticket lr-button"
-      (click)="addBet({ game: game.hTeam.fullName, quota: 1.8 })"
+      (click)="
+        addBet({
+          gameId: game.gameId,
+          game: game.hTeam.shortName + ' - ' + game.vTeam.shortName,
+          betOn: 1,
+          quota: game.quota1
+        })
+      "
     >
-      XXXXXXXXXXXXX
+      Home : {{ game.quota1 }}
     </button>
     <button
       mat-raised-button
       color="primary"
       class="button-ticket center-button"
+      (click)="
+        addBet({
+          gameId: game.gameId,
+          game: game.hTeam.shortName + ' - ' + game.vTeam.shortName,
+          betOn: 'X',
+          quota: game.quotaX
+        })
+      "
     >
-      XXXXXXXXXXXX
+      Draw : {{ game.quotaX }}
     </button>
-    <button mat-raised-button color="primary" class="button-ticket lr-button">
-      XXX
+    <button
+      mat-raised-button
+      color="primary"
+      class="button-ticket lr-button"
+      (click)="
+        addBet({
+          gameId: game.gameId,
+          game: game.hTeam.shortName + ' - ' + game.vTeam.shortName,
+          betOn: 2,
+          quota: game.quota2
+        })
+      "
+    >
+      Away : {{ game.quota2 }}
     </button>
   </div>
   <mat-divider></mat-divider>

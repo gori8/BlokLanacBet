@@ -52,7 +52,10 @@ contract("BlokLanacBet", (accounts) => {
     });
 
     let balance = await web3.eth.getBalance(accounts[1]);
-    let res = await instanceBLBet.processBetResult.sendTransaction(accounts[1]);
+    let owner = await instanceBLBet.owner();
+    let res = await instanceBLBet.processBetResult(accounts[1], {
+      from: owner,
+    });
     let balance1 = await web3.eth.getBalance(accounts[1]);
     let expectedResult = (winningBetAmount * 220 * 150) / Math.pow(10, 4);
     assert.equal(

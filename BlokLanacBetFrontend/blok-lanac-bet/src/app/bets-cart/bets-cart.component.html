@@ -1,3 +1,10 @@
 <div *ngFor="let bet of bets$ | async">
-  {{ bet.game }} {{ bet.quota }}<br />
+  {{ bet.game }} {{ bet.betOn }} {{ bet.quota }}<br />
+</div>
+<div *ngIf="totalQuota != 1">
+  Total : {{ totalQuota }}
+  <br />
+  <a mat-raised-button color="primary" [routerLink]="['/make-bet']">
+    Place bets
+  </a>
 </div>

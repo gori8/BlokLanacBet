@@ -28,6 +28,5 @@ export class HomeComponent implements OnInit {
 
   addBet(bet: any): void {
     this.localStorageService.addBet(bet);
-    console.log(bet);
   }
 }

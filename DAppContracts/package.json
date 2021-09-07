@@ -17,6 +17,7 @@
     "prettier-plugin-solidity": "^1.0.0-beta.13"
   },
   "dependencies": {
+    "node-fetch": "^3.0.0",
     "solidity-util": "github:willitscale/solidity-util"
   }
 }

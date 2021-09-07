@@ -1,8 +1,12 @@
 const Bookmaker = artifacts.require("Bookmaker");
 const BlokLanacBet = artifacts.require("BlokLanacBet");
+const { readFile } = require("fs/promises");
 
 async function main() {
-  let accounts = await web3.eth.getAccounts();
+  let data = await readFile("../../results-json-server/db.json", "utf8");
+  console.log(data);
+
+  /*let accounts = await web3.eth.getAccounts();
   let instance = await Bookmaker.deployed();
   let instanceBLBet = await BlokLanacBet.deployed();
   await instance.fulfill(web3.utils.asciiToHex("s-101-105-9460"));
@@ -19,7 +23,7 @@ async function main() {
   await instanceBLBet.makeBet(accounts[2], losingBet, {
     from: accounts[2],
     value: losingBetAmount,
-  });
+  });*/
 }
 
 // For truffle exec

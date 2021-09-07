@@ -12,6 +12,15 @@ export class LocalstorageService {
     return this.localStorage.getItem('bets');
   }
 
+  clearBets(): void {
+    this.localStorage.setItem('bets', []).subscribe(
+      () => {},
+      (err) => {
+        alert('Error clearing bets!!!');
+      }
+    );
+  }
+
   addBet(bet: any): void {
     this.getBets().subscribe((bets) => {
       if (bets == null) {

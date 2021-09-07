@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
-import { StorageMap } from '@ngx-pwa/local-storage';
+import { LocalStorage, StorageMap } from '@ngx-pwa/local-storage';
 import { EthereumService } from '../_services/eth/ethereum-service.service';
+import { LocalstorageService } from '../_services/local-storage/localstorage.service';
 
 @Component({
   selector: 'app-navbar',
@@ -10,17 +11,14 @@ import { EthereumService } from '../_services/eth/ethereum-service.service';
 export class NavbarComponent implements OnInit {
   constructor(
     public ethService: EthereumService,
-    private storageMap: StorageMap
+    private localStoragaService: LocalstorageService
   ) {}
 
   ngOnInit(): void {}
 
   connectMetamaskAccount() {
     this.ethService.connectAccount().then(() => {
-      this.storageMap.clear().subscribe({
-        next: () => {},
-        error: (error) => {},
-      });
+      this.localStoragaService.clearBets();
     });
   }
 }

@@ -14,6 +14,12 @@ import { MatDividerModule } from '@angular/material/divider';
 import { MatToolbarModule } from '@angular/material/toolbar';
 import { MatIconModule } from '@angular/material/icon';
 import { BetsCartComponent } from './bets-cart/bets-cart.component';
+import { MakeBetComponent } from './make-bet/make-bet.component';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { MatInputModule } from '@angular/material/input';
+import { MatSnackBarModule } from '@angular/material/snack-bar';
+import { ScoresService } from './_services/scores/scores.service';
 
 @NgModule({
   declarations: [
@@ -21,6 +27,7 @@ import { BetsCartComponent } from './bets-cart/bets-cart.component';
     NavbarComponent,
     HomeComponent,
     BetsCartComponent,
+    MakeBetComponent,
   ],
   imports: [
     BrowserModule,
@@ -33,8 +40,13 @@ import { BetsCartComponent } from './bets-cart/bets-cart.component';
     MatDividerModule,
     MatToolbarModule,
     MatIconModule,
+    MatFormFieldModule,
+    FormsModule,
+    ReactiveFormsModule,
+    MatInputModule,
+    MatSnackBarModule,
   ],
-  providers: [],
+  providers: [ScoresService],
   bootstrap: [AppComponent],
 })
 export class AppModule {}
