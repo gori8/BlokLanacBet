@@ -1,6 +1,7 @@
 const Bookmaker = artifacts.require("Bookmaker");
 const BlokLanacBet = artifacts.require("BlokLanacBet");
 const { readFile } = require("fs/promises");
+const axios = require("axios").default;
 
 async function main() {
   let accounts = await web3.eth.getAccounts();
@@ -19,6 +20,7 @@ async function main() {
       await instanceBLBet.processBetResult(bet.eth_address, bet.id, {
         from: owner,
       });
+      await axios.put("http://localhost:3000/bets/" + bet.id, bet);
     }
   }
 }

@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import Web3 from 'web3';
 import Web3Modal from 'web3modal';
 import { Subject } from 'rxjs';
+import { BetsService } from '../bets/bets.service';
 import { ScoresService } from '../scores/scores.service';
 const BlokLanacBetAbi = require('../../../../../../DAppContracts/build/contracts/BlokLanacBet.json');
 
@@ -20,7 +21,10 @@ export class EthereumService {
   private accountStatusSource = new Subject<any>();
   accountStatus$ = this.accountStatusSource.asObservable();
 
-  constructor(private scoreService: ScoresService) {
+  constructor(
+    private betsService: BetsService,
+    private scoresService: ScoresService
+  ) {
     const providerOptions = {
       /*walletconnect: {
         package: WalletConnectProvider, // required
@@ -57,7 +61,7 @@ export class EthereumService {
       BlokLanacBetAbi.networks['5777'].address
     );
 
-    let bets = await this.scoreService
+    let bets = await this.betsService
       .getAllUserBets(this.accounts[0])
       .toPromise();
     console.log(this.accounts[0]);
@@ -95,7 +99,7 @@ export class EthereumService {
         value: contractBetAmount,
       })
       .then((tx) => {
-        return this.scoreService.getGames().toPromise();
+        return this.scoresService.getGames(contractGames).toPromise();
       })
       .then((games) => {
         let filteredGames = games.filter((game: { gameId: any }) => {
@@ -116,7 +120,7 @@ export class EthereumService {
           status: 0,
           lastGameEndTime: dateOfLastGame,
         };
-        return this.scoreService.addBet(newBet).toPromise();
+        return this.betsService.addBet(newBet).toPromise();
       })
       .then((newBet) => {
         this.activeBet = newBet;
@@ -150,7 +154,7 @@ export class EthereumService {
     this.activeBetsEventSubsriber
       .on('data', (event: any) => {
         console.log('DATA:', event);
-        this.scoreService.getBetById(this.activeBet.id).subscribe(
+        /*this.scoreService.getBetById(this.activeBet.id).subscribe(
           (res) => {
             res.status = 2;
             this.scoreService.changeBetStatus(res).subscribe(
@@ -159,7 +163,7 @@ export class EthereumService {
             );
           },
           (err) => {}
-        );
+        );*/
       })
       .on('changed', (changed: any) => console.log('CHANGED:', changed))
       .on('error', (err: any) => {

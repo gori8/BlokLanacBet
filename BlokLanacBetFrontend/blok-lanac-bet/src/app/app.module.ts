@@ -19,7 +19,10 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { MatInputModule } from '@angular/material/input';
 import { MatSnackBarModule } from '@angular/material/snack-bar';
+import { MatDatepickerModule } from '@angular/material/datepicker';
 import { ScoresService } from './_services/scores/scores.service';
+import { MatNativeDateModule } from '@angular/material/core';
+import { BetsService } from './_services/bets/bets.service';
 
 @NgModule({
   declarations: [
@@ -45,8 +48,10 @@ import { ScoresService } from './_services/scores/scores.service';
     ReactiveFormsModule,
     MatInputModule,
     MatSnackBarModule,
+    MatDatepickerModule,
+    MatNativeDateModule,
   ],
-  providers: [ScoresService],
+  providers: [BetsService, ScoresService, MatDatepickerModule],
   bootstrap: [AppComponent],
 })
 export class AppModule {}

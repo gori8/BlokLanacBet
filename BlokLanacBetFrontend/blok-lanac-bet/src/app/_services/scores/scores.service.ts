@@ -12,25 +12,13 @@ const BASE_API_URL =
 export class ScoresService {
   constructor(private http: HttpClient) {}
 
-  getGames(): Observable<any> {
-    return this.http.get(`${BASE_API_URL}/games`);
-  }
-
-  addBet(bet: any): Observable<any> {
-    return this.http.post(`${LOCALHOST_API_URL}/bets`, bet);
-  }
-
-  changeBetStatus(bet): Observable<any> {
-    return this.http.put(`${LOCALHOST_API_URL}/bets/${bet.id}`, bet);
-  }
-
-  getAllUserBets(gamblerAddress): Observable<any> {
+  getGames(ids): Observable<any> {
     return this.http.get(
-      `${LOCALHOST_API_URL}/bets?eth_address_like=${gamblerAddress}`
+      `${BASE_API_URL}/games?gameId=${ids.join('&gameId=')}`
     );
   }
 
-  getBetById(id): Observable<any> {
-    return this.http.get(`${LOCALHOST_API_URL}/bets/${id}`);
+  getGamesForTheDay(date): Observable<any> {
+    return this.http.get(`${BASE_API_URL}/games?date=${date}`);
   }
 }
