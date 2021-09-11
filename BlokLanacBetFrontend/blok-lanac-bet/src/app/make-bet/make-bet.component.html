@@ -1,23 +1,22 @@
-<div class="body">
-  <mat-card class="account">
-    <form [formGroup]="transactionForm" (ngSubmit)="makeBet()">
-      <mat-form-field appearance="outline">
-        <mat-label>Amount</mat-label>
-        <input matInput placeholder="Eth amount" formControlName="amount" />
-        <mat-icon matSuffix>attach_money</mat-icon>
-        <mat-hint></mat-hint>
-      </mat-form-field>
-      <button mat-raised-button color="primary" type="submit">Deposit</button>
-    </form>
-  </mat-card>
-  <mat-card class="account">
-    <button
-      type="button"
-      mat-raised-button
-      color="primary"
-      (click)="processBetResult()"
-    >
-      Process Result
-    </button>
-  </mat-card>
+<div>
+  <div class="card-center-div" style="margin-top: 20px">
+    <mat-card>
+      <form [formGroup]="transactionForm" (ngSubmit)="makeBet()">
+        <mat-form-field appearance="outline">
+          <mat-label>Amount</mat-label>
+          <input matInput placeholder="ETC amount" formControlName="amount" />
+
+          <mat-icon matSuffix style="margin-right: 5px"
+            ><img
+              src="assets/svg/white/etc.svg"
+              alt="EthSVG"
+              height="32px"
+              width="32px"
+          /></mat-icon>
+          <mat-hint></mat-hint> </mat-form-field
+        ><br />
+        <button mat-raised-button color="primary" type="submit">Deposit</button>
+      </form>
+    </mat-card>
+  </div>
 </div>

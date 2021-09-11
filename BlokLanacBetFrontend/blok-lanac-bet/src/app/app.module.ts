@@ -22,6 +22,7 @@ import { MatSnackBarModule } from '@angular/material/snack-bar';
 import { MatDatepickerModule } from '@angular/material/datepicker';
 import { ScoresService } from './_services/scores/scores.service';
 import { MatNativeDateModule } from '@angular/material/core';
+import { MatTableModule } from '@angular/material/table';
 import { BetsService } from './_services/bets/bets.service';
 
 @NgModule({
@@ -50,6 +51,7 @@ import { BetsService } from './_services/bets/bets.service';
     MatSnackBarModule,
     MatDatepickerModule,
     MatNativeDateModule,
+    MatTableModule,
   ],
   providers: [BetsService, ScoresService, MatDatepickerModule],
   bootstrap: [AppComponent],

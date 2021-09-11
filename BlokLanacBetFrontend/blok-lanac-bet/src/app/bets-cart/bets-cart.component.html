@@ -1,10 +1,38 @@
-<div *ngFor="let bet of bets$ | async">
-  {{ bet.game }} {{ bet.betOn }} {{ bet.quota }}<br />
-</div>
 <div *ngIf="totalQuota != 1">
-  Total : {{ totalQuota }}
-  <br />
-  <a mat-raised-button color="primary" [routerLink]="['/make-bet']">
-    Place bets
-  </a>
+  <table class="table table-dark">
+    <thead>
+      <tr>
+        <th scope="col">#</th>
+        <th scope="col">Game</th>
+        <th scope="col">Bet</th>
+        <th scope="col">Quota</th>
+        <th scope="col"></th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let bet of bets$ | async; index as i">
+        <th scope="row">{{ i + 1 }}</th>
+        <td>{{ bet.game }}</td>
+        <td>{{ bet.betOn }}</td>
+        <td>{{ bet.quota }}</td>
+        <td>
+          <button mat-button aria-label="Remove bet">
+            <mat-icon color="primary">delete</mat-icon>
+          </button>
+        </td>
+      </tr>
+      <tr>
+        <th scope="row"></th>
+        <td></td>
+        <td>Total</td>
+        <td>{{ totalQuota }}</td>
+        <td></td>
+      </tr>
+    </tbody>
+  </table>
+  <div class="card-center-div">
+    <a mat-raised-button color="primary" [routerLink]="['/make-bet']">
+      Place bets
+    </a>
+  </div>
 </div>
