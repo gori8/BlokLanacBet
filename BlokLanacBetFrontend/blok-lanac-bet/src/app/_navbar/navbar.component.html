@@ -3,8 +3,22 @@
     <img src="assets/bloklanacbetwhite.png" class="logo-image" />
   </button>
 
-  <span><a routerLink="/">My App</a></span>
   <span class="example-spacer"></span>
+
+  <button mat-flat-button style="margin-right: 20px">
+    <ng-container
+      *ngIf="ethService.accountStatus$ | async as account; else defaultTemplate"
+    >
+      <span>Address: {{ account }}</span>
+    </ng-container>
+    <ng-container *ngIf="ethService.accountBalance$ | async as balance"
+      ><br />
+      <span>Balance: {{ balance }} ETC </span>
+    </ng-container>
+    <ng-template #defaultTemplate>
+      <span>Please connect to your metamask account</span>
+    </ng-template>
+  </button>
   <button
     mat-raised-button
     aria-label="Connect with metamask"
@@ -12,10 +26,4 @@
   >
     <mat-icon><img src="assets/metamaskSVG/metamask-fox.svg" /></mat-icon>
   </button>
-  <ng-container *ngIf="ethService.accountStatus$ | async as account">
-    <span>{{ account }}</span>
-  </ng-container>
-  <ng-container *ngIf="ethService.accountBalance$ | async as balance">
-    <span>{{ balance }}</span>
-  </ng-container>
 </mat-toolbar>

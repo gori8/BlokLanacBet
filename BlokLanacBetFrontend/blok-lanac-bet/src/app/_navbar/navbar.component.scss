@@ -6,3 +6,15 @@
   height: 75px;
   width: 301px;
 }
+$darkGrey: rgba(32, 32, 32, 0.2);
+.mat-button:hover {
+  background-color: $darkGrey;
+}
+.example-spacer {
+  flex: 1 1 auto;
+}
+
+.mat-flat-button {
+  text-align: left;
+  line-height: 130%;
+}
