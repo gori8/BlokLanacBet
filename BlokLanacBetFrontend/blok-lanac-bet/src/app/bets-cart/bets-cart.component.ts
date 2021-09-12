@@ -1,7 +1,9 @@
 import { Component, OnInit } from '@angular/core';
+import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { MatSnackBar } from '@angular/material/snack-bar';
 import { StorageMap } from '@ngx-pwa/local-storage';
 import { Observable } from 'rxjs';
-import { LocalstorageService } from '../_services/local-storage/localstorage.service';
+import { EthereumService } from '../_services/eth/ethereum-service.service';
 
 @Component({
   selector: 'app-bets-cart',
@@ -12,7 +14,12 @@ export class BetsCartComponent implements OnInit {
   bets$: Observable<any> | undefined;
   totalQuota = 1;
 
-  constructor(private storageMap: StorageMap) {}
+  constructor(
+    private storageMap: StorageMap,
+    private fb: FormBuilder,
+    private ethService: EthereumService,
+    private snackBar: MatSnackBar
+  ) {}
 
   ngOnInit() {
     this.bets$ = this.storageMap.watch('bets');
@@ -29,6 +36,46 @@ export class BetsCartComponent implements OnInit {
         this.totalQuota = Number(this.totalQuota.toFixed(2));
       },
       (error) => {}
+    );
+  }
+
+  transactionForm: FormGroup = this.fb.group({
+    amount: ['', Validators.required],
+  });
+
+  makeBet() {
+    let bets: [];
+    this.storageMap.get('bets').subscribe(
+      (res: any) => {
+        bets = res;
+        console.log(bets);
+        this.ethService
+          .makeBet(bets, this.transactionForm.get('amount')!.value)
+          .then(
+            (res) => {
+              this.snackBar.open(
+                'You placed your bets successfully. Good Luck!',
+                null,
+                { duration: 3000 }
+              );
+            },
+            (err) => {
+              throw err;
+            }
+          );
+      },
+      (error) => {}
+    );
+  }
+
+  processBetResult() {
+    this.ethService.processBetResult().then(
+      (res) => {
+        console.log(res);
+      },
+      (error) => {
+        console.log(error);
+      }
     );
   }
 }

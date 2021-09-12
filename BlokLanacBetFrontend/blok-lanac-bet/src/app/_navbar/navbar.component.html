@@ -1,29 +1,21 @@
 <mat-toolbar color="primary">
-  <button
-    mat-icon-button
-    class="example-icon"
-    aria-label="Example icon-button with menu icon"
-  >
-    <mat-icon>menu</mat-icon>
+  <button mat-button aria-label="Logo">
+    <img src="assets/bloklanacbetwhite.png" class="logo-image" />
   </button>
+
   <span><a routerLink="/">My App</a></span>
   <span class="example-spacer"></span>
   <button
-    mat-icon-button
-    class="example-icon favorite-icon"
-    aria-label="Example icon-button with heart icon"
+    mat-raised-button
+    aria-label="Connect with metamask"
     (click)="connectMetamaskAccount()"
   >
-    <mat-icon>favorite</mat-icon>
-  </button>
-  <button
-    mat-icon-button
-    class="example-icon"
-    aria-label="Example icon-button with share icon"
-  >
-    <mat-icon>share</mat-icon>
+    <mat-icon><img src="assets/metamaskSVG/metamask-fox.svg" /></mat-icon>
   </button>
   <ng-container *ngIf="ethService.accountStatus$ | async as account">
     <span>{{ account }}</span>
+  </ng-container>
+  <ng-container *ngIf="ethService.accountBalance$ | async as balance">
+    <span>{{ balance }}</span>
   </ng-container>
 </mat-toolbar>

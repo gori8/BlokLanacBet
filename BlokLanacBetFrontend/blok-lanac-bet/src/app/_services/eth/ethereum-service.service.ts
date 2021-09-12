@@ -20,6 +20,8 @@ export class EthereumService {
 
   private accountStatusSource = new Subject<any>();
   accountStatus$ = this.accountStatusSource.asObservable();
+  private accountBalanceSource = new Subject<any>();
+  accountBalance$ = this.accountBalanceSource.asObservable();
 
   constructor(
     private betsService: BetsService,
@@ -55,6 +57,10 @@ export class EthereumService {
     this.web3js = new Web3(this.provider); // create web3 instance
     this.accounts = await this.web3js.eth.getAccounts();
     this.accountStatusSource.next(this.accounts);
+    let balanceInWei = await this.web3js.eth.getBalance(this.accounts[0]);
+    let balance = await Web3.utils.fromWei(balanceInWei, 'ether');
+    console.log('BALANCE: ', balance);
+    this.accountBalanceSource.next(balance);
 
     this.blokLanacBetContract = new this.web3js.eth.Contract(
       BlokLanacBetAbi.abi,
