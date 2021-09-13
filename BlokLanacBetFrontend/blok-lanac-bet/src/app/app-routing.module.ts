@@ -1,11 +1,11 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
-import { MakeBetComponent } from './make-bet/make-bet.component';
+import { BetHistoryComponent } from './bet-history/bet-history.component';
 import { HomeComponent } from './_home/home.component';
 
 const routes: Routes = [
   { path: '', component: HomeComponent },
-  { path: 'make-bet', component: MakeBetComponent },
+  { path: 'bet/history', component: BetHistoryComponent },
 ];
 
 @NgModule({

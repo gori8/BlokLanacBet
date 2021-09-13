@@ -4,6 +4,7 @@ import { MatSnackBar } from '@angular/material/snack-bar';
 import { StorageMap } from '@ngx-pwa/local-storage';
 import { Observable } from 'rxjs';
 import { EthereumService } from '../_services/eth/ethereum-service.service';
+import { LocalstorageService } from '../_services/local-storage/localstorage.service';
 
 @Component({
   selector: 'app-bets-cart',
@@ -13,12 +14,15 @@ import { EthereumService } from '../_services/eth/ethereum-service.service';
 export class BetsCartComponent implements OnInit {
   bets$: Observable<any> | undefined;
   totalQuota = 1;
+  loading;
+  bets;
 
   constructor(
     private storageMap: StorageMap,
     private fb: FormBuilder,
     private ethService: EthereumService,
-    private snackBar: MatSnackBar
+    private snackBar: MatSnackBar,
+    private localStorageService: LocalstorageService
   ) {}
 
   ngOnInit() {
@@ -29,6 +33,7 @@ export class BetsCartComponent implements OnInit {
   calculateTotalQuota() {
     this.bets$?.subscribe(
       (bets) => {
+        this.bets = bets;
         this.totalQuota = 1;
         bets.forEach((bet: any) => {
           this.totalQuota *= bet.quota;
@@ -44,38 +49,24 @@ export class BetsCartComponent implements OnInit {
   });
 
   makeBet() {
-    let bets: [];
-    this.storageMap.get('bets').subscribe(
-      (res: any) => {
-        bets = res;
-        console.log(bets);
-        this.ethService
-          .makeBet(bets, this.transactionForm.get('amount')!.value)
-          .then(
-            (res) => {
-              this.snackBar.open(
-                'You placed your bets successfully. Good Luck!',
-                null,
-                { duration: 3000 }
-              );
-            },
-            (err) => {
-              throw err;
-            }
-          );
-      },
-      (error) => {}
-    );
-  }
+    this.loading = true;
 
-  processBetResult() {
-    this.ethService.processBetResult().then(
-      (res) => {
-        console.log(res);
-      },
-      (error) => {
-        console.log(error);
-      }
-    );
+    this.ethService
+      .makeBet(this.bets, this.transactionForm.get('amount')!.value)
+      .then(
+        (res) => {
+          this.loading = undefined;
+          this.snackBar.open(
+            'You placed your bets successfully. Good Luck!',
+            null,
+            { duration: 3000 }
+          );
+          this.localStorageService.clearBets();
+        },
+        (err) => {
+          this.loading = undefined;
+          throw err;
+        }
+      );
   }
 }

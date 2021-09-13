@@ -23,6 +23,7 @@
 //
 // const fs = require('fs');
 // const mnemonic = fs.readFileSync(".secret").toString().trim();
+const HDWalletProvider = require("@truffle/hdwallet-provider");
 
 module.exports = {
   /**
@@ -47,6 +48,17 @@ module.exports = {
       port: 7545, // Standard Ethereum port (default: none)
       network_id: "*", // Any network (default: none),
       //from: "0x76f5d747Ae7441a550063EA3C30793C7b09b0Ca5",
+    },
+    kovan: {
+      provider: () => {
+        return new HDWalletProvider(
+          "bring silver siren youth long scatter boost east guide dutch water rug",
+          "https://kovan.infura.io/v3/1107be06792f4f21bc86579df54a60ea"
+        );
+      },
+      networkCheckTimeout: 999999,
+      network_id: "42",
+      skipDryRun: true,
     },
     // Another network with more advanced options...
     // advanced: {

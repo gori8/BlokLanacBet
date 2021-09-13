@@ -32,7 +32,11 @@
   </table>
   <div>
     <div class="card-center-div">
-      <form [formGroup]="transactionForm" (ngSubmit)="makeBet()">
+      <form
+        *ngIf="!loading"
+        [formGroup]="transactionForm"
+        (ngSubmit)="makeBet()"
+      >
         <mat-form-field appearance="outline">
           <mat-label>Amount</mat-label>
           <input matInput placeholder="ETC amount" formControlName="amount" />
@@ -46,10 +50,13 @@
           /></mat-icon>
           <mat-hint></mat-hint>
         </mat-form-field>
+        <div class="card-center-div">
+          <button mat-raised-button color="primary" type="submit">
+            Deposit
+          </button>
+        </div>
       </form>
-    </div>
-    <div class="card-center-div">
-      <button mat-raised-button color="primary" type="submit">Deposit</button>
+      <mat-spinner *ngIf="loading"></mat-spinner>
     </div>
   </div>
 </div>

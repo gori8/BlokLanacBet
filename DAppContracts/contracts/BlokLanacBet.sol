@@ -17,8 +17,8 @@ struct Bet {
 }
 
 contract BlokLanacBet {
-    address private bookmakerContract;
-    mapping(address => Bet) private bets;
+    address public bookmakerContract;
+    mapping(address => Bet) public bets;
     address payable public owner;
     event DepositWinningBet(
         address gambler,

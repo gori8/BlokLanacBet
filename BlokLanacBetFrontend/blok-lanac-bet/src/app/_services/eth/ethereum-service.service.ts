@@ -4,6 +4,8 @@ import Web3Modal from 'web3modal';
 import { Subject } from 'rxjs';
 import { BetsService } from '../bets/bets.service';
 import { ScoresService } from '../scores/scores.service';
+import { ConfigService } from '../config/config-service.service';
+import { MatSnackBar } from '@angular/material/snack-bar';
 const BlokLanacBetAbi = require('../../../../../../DAppContracts/build/contracts/BlokLanacBet.json');
 
 @Injectable({
@@ -22,11 +24,15 @@ export class EthereumService {
   accountStatus$ = this.accountStatusSource.asObservable();
   private accountBalanceSource = new Subject<any>();
   accountBalance$ = this.accountBalanceSource.asObservable();
+  currentAccount;
 
   constructor(
     private betsService: BetsService,
-    private scoresService: ScoresService
+    private scoresService: ScoresService,
+    private configService: ConfigService,
+    private snackBar: MatSnackBar
   ) {
+    console.log('Network is : ' + configService.config.network);
     const providerOptions = {
       /*walletconnect: {
         package: WalletConnectProvider, // required
@@ -37,7 +43,7 @@ export class EthereumService {
     };
 
     this.web3Modal = new Web3Modal({
-      network: 'ganache', // optional
+      network: configService.config.network, // optional
       cacheProvider: true, // optional
       providerOptions, // required
       theme: {
@@ -61,13 +67,14 @@ export class EthereumService {
     let balance = await Web3.utils.fromWei(balanceInWei, 'ether');
     console.log('BALANCE: ', balance);
     this.accountBalanceSource.next(balance);
+    this.currentAccount = this.accounts[0];
 
     this.blokLanacBetContract = new this.web3js.eth.Contract(
       BlokLanacBetAbi.abi,
-      BlokLanacBetAbi.networks['5777'].address
+      BlokLanacBetAbi.networks[this.configService.config.network_id].address
     );
 
-    let bets = await this.betsService
+    /*let bets = await this.betsService
       .getAllUserBets(this.accounts[0])
       .toPromise();
     console.log(this.accounts[0]);
@@ -80,7 +87,7 @@ export class EthereumService {
       this.activeBet = { id: 500000 };
     }
 
-    this.setUpEventSubscriber();
+    this.setUpEventSubscriber();*/
   }
 
   async makeBet(bets: any, amount: number) {
@@ -89,7 +96,6 @@ export class EthereumService {
     let contractBets: any[] = [];
     bets.forEach((bet: any) => {
       contractGames.push(bet.gameId);
-      let betOn = bet.betOn;
       contractBets.push(bet.betOn);
     });
     let contractBet = {
@@ -160,6 +166,10 @@ export class EthereumService {
     this.activeBetsEventSubsriber
       .on('data', (event: any) => {
         console.log('DATA:', event);
+        this.snackBar.open("You've just won your bet. Congrats!", null, {
+          duration: 3000,
+        });
+        this.connectAccount();
         /*this.scoreService.getBetById(this.activeBet.id).subscribe(
           (res) => {
             res.status = 2;

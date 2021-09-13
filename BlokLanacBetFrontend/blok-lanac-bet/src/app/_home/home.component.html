@@ -45,7 +45,10 @@
           <img [src]="game.vTeam.logo" height="40" width="40" /></button
       ></mat-card>
     </div>
-    <div class="ticket-button-row">
+    <div
+      class="ticket-button-row"
+      *ngIf="addedGames.get(game.gameId) == undefined"
+    >
       <button
         mat-raised-button
         color="primary"
@@ -88,6 +91,68 @@
             quota: game.quota2
           })
         "
+      >
+        Away : {{ game.quota2 }}
+      </button>
+    </div>
+    <div
+      class="ticket-button-row"
+      *ngIf="addedGames.get(game.gameId) != undefined"
+    >
+      <button
+        mat-raised-button
+        disabled
+        class="button-ticket lr-button"
+        (click)="
+          addBet({
+            gameId: game.gameId,
+            game: game.hTeam.shortName + ' - ' + game.vTeam.shortName,
+            betOn: 1,
+            quota: game.quota1
+          })
+        "
+        [ngStyle]="{
+          'background-color':
+            addedGames.get(game.gameId) == 1 ? '#202020' : '#616161'
+        }"
+      >
+        Home : {{ game.quota1 }}
+      </button>
+      <button
+        mat-raised-button
+        disabled
+        class="button-ticket center-button"
+        (click)="
+          addBet({
+            gameId: game.gameId,
+            game: game.hTeam.shortName + ' - ' + game.vTeam.shortName,
+            betOn: 'X',
+            quota: game.quotaX
+          })
+        "
+        [ngStyle]="{
+          'background-color':
+            addedGames.get(game.gameId) == 'X' ? '#202020' : '#616161'
+        }"
+      >
+        Draw : {{ game.quotaX }}
+      </button>
+      <button
+        mat-raised-button
+        disabled
+        class="button-ticket lr-button"
+        (click)="
+          addBet({
+            gameId: game.gameId,
+            game: game.hTeam.shortName + ' - ' + game.vTeam.shortName,
+            betOn: 2,
+            quota: game.quota2
+          })
+        "
+        [ngStyle]="{
+          'background-color':
+            addedGames.get(game.gameId) == '2' ? '#202020' : '#616161'
+        }"
       >
         Away : {{ game.quota2 }}
       </button>

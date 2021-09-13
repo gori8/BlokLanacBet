@@ -1,0 +1,34 @@
+<div *ngFor="let bet of bets">
+  <div class="card-center-div">
+    <table class="table table-dark" style="width: 30%">
+      <thead>
+        <tr>
+          <th scope="col">#</th>
+          <th scope="col">Game</th>
+          <th scope="col">Bet</th>
+          <th scope="col">Quota</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let singleBet of bet.bet">
+          <th scope="row">{{ i + 1 }}</th>
+          <td>{{ singleBet.game }}</td>
+          <td>{{ singleBet.betOn }}</td>
+          <td>{{ singleBet.quota }}</td>
+        </tr>
+        <tr>
+          <th scope="row"></th>
+          <td></td>
+          <td>Total</td>
+          <td>{{ bet.totalQuota }}</td>
+        </tr>
+        <tr>
+          <th scope="row"></th>
+          <td></td>
+          <td>Bet status:</td>
+          <td>{{ bet.statusText }}</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>

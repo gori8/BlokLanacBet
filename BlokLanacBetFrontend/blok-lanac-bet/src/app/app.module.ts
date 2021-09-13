@@ -1,4 +1,4 @@
-import { NgModule } from '@angular/core';
+import { APP_INITIALIZER, NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 
 import { AppRoutingModule } from './app-routing.module';
@@ -23,7 +23,14 @@ import { MatDatepickerModule } from '@angular/material/datepicker';
 import { ScoresService } from './_services/scores/scores.service';
 import { MatNativeDateModule } from '@angular/material/core';
 import { MatTableModule } from '@angular/material/table';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { BetsService } from './_services/bets/bets.service';
+import { ConfigService } from './_services/config/config-service.service';
+import { BetHistoryComponent } from './bet-history/bet-history.component';
+
+export const configFactory = (configService: ConfigService) => {
+  return () => configService.loadConfig();
+};
 
 @NgModule({
   declarations: [
@@ -32,6 +39,7 @@ import { BetsService } from './_services/bets/bets.service';
     HomeComponent,
     BetsCartComponent,
     MakeBetComponent,
+    BetHistoryComponent,
   ],
   imports: [
     BrowserModule,
@@ -52,8 +60,19 @@ import { BetsService } from './_services/bets/bets.service';
     MatDatepickerModule,
     MatNativeDateModule,
     MatTableModule,
+    MatProgressSpinnerModule,
   ],
-  providers: [BetsService, ScoresService, MatDatepickerModule],
+  providers: [
+    BetsService,
+    ScoresService,
+    MatDatepickerModule,
+    {
+      provide: APP_INITIALIZER,
+      useFactory: configFactory,
+      deps: [ConfigService],
+      multi: true,
+    },
+  ],
   bootstrap: [AppComponent],
 })
 export class AppModule {}
