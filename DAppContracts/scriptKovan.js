@@ -7,8 +7,8 @@ async function main() {
   let instance = await BookmakerKovan.deployed();
   let instanceBLBet = await BlokLanacBet.deployed();
   let owner = await instanceBLBet.owner();
-  /*await instance.requestQuotas("9450");
-  await instance.requestQuotas("9451");
+  await instance.requestQuotas("9460");
+  /*await instance.requestQuotas("9451");
   await instance.requestQuotas("9452");
   await instance.requestQuotas("9453");
   await instance.requestQuotas("9428");
@@ -20,7 +20,7 @@ async function main() {
   await instance.requestScore("9453");
   await instance.requestScore("9428");
   await instance.requestScore("9438");
-  await instance.requestScore("9460");*/
+  await instance.requestScore("9460");
 
   let data = await readFile("../../results-json-server/db.json", "utf8");
   let games = JSON.parse(data).games;
@@ -34,7 +34,7 @@ async function main() {
   await instanceBLBet.sendTransaction({
     from: owner,
     value: amount,
-  });
+  });*/
 }
 
 // For truffle exec
