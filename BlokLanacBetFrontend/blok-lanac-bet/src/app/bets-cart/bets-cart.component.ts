@@ -52,7 +52,7 @@ export class BetsCartComponent implements OnInit {
     this.loading = true;
 
     this.ethService
-      .makeBet(this.bets, this.transactionForm.get('amount')!.value)
+      .placeBet(this.bets, this.transactionForm.get('amount')!.value)
       .then(
         (res) => {
           this.loading = undefined;
@@ -62,6 +62,7 @@ export class BetsCartComponent implements OnInit {
             { duration: 3000 }
           );
           this.localStorageService.clearBets();
+          this.ethService.connectAccount();
         },
         (err) => {
           this.loading = undefined;

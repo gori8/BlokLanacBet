@@ -1,11 +1,11 @@
-const BookmakerKovan = artifacts.require("BookmakerKovan");
+const Bookmaker = artifacts.require("BookmakerDevelopment");
 const BlokLanacBet = artifacts.require("BlokLanacBet");
 const { readFile } = require("fs/promises");
 const axios = require("axios").default;
 
 async function main() {
   let accounts = await web3.eth.getAccounts();
-  let instance = await BookmakerKovan.deployed();
+  let instance = await Bookmaker.deployed();
   let instanceBLBet = await BlokLanacBet.deployed();
   let owner = await instanceBLBet.owner();
   let data = await readFile("../../results-json-server/db.json", "utf8");
@@ -21,7 +21,7 @@ async function main() {
       });
       let result = await instanceBLBet.bets(bet.eth_address);
       bet.status = result.status;
-      console.log("RESULT: ", result);
+      console.log("AMOUNT: ", result.amount.toString());
       console.log("STATUS: ", result.status.toString());
       await axios.put("http://localhost:3000/bets/" + bet.id, bet);
     }

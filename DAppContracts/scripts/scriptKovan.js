@@ -1,4 +1,4 @@
-const BookmakerKovan = artifacts.require("BookmakerKovan");
+const BookmakerKovan = artifacts.require("Bookmaker");
 const BlokLanacBet = artifacts.require("BlokLanacBet");
 const { readFile } = require("fs/promises");
 
@@ -7,8 +7,8 @@ async function main() {
   let instance = await BookmakerKovan.deployed();
   let instanceBLBet = await BlokLanacBet.deployed();
   let owner = await instanceBLBet.owner();
-  await instance.requestQuotas("9460");
-  /*await instance.requestQuotas("9451");
+  /*await instance.requestQuotas("9450");
+  await instance.requestQuotas("9451");
   await instance.requestQuotas("9452");
   await instance.requestQuotas("9453");
   await instance.requestQuotas("9428");
@@ -28,13 +28,13 @@ async function main() {
   for (let game of games) {
     await instance.simpleFulfill(web3.utils.asciiToHex(game.oracle_score));
     await instance.simpleFulfill(web3.utils.asciiToHex(game.oracle_quotas));
-  }
+  }*/
 
-  let amount = web3.utils.toWei("0.02", "ether");
+  let amount = web3.utils.toWei("0.1", "ether");
   await instanceBLBet.sendTransaction({
     from: owner,
     value: amount,
-  });*/
+  });
 }
 
 // For truffle exec

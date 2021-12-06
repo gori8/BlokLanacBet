@@ -14,7 +14,6 @@ import { MatDividerModule } from '@angular/material/divider';
 import { MatToolbarModule } from '@angular/material/toolbar';
 import { MatIconModule } from '@angular/material/icon';
 import { BetsCartComponent } from './bets-cart/bets-cart.component';
-import { MakeBetComponent } from './make-bet/make-bet.component';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { MatInputModule } from '@angular/material/input';
@@ -38,7 +37,6 @@ export const configFactory = (configService: ConfigService) => {
     NavbarComponent,
     HomeComponent,
     BetsCartComponent,
-    MakeBetComponent,
     BetHistoryComponent,
   ],
   imports: [

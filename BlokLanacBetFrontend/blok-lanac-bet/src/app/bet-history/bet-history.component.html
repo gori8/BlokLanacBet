@@ -1,5 +1,5 @@
 <div *ngFor="let bet of bets">
-  <div class="card-center-div">
+  <div class="card-center-div" style="margin-top: 30px">
     <table class="table table-dark" style="width: 30%">
       <thead>
         <tr>
@@ -10,7 +10,7 @@
         </tr>
       </thead>
       <tbody>
-        <tr *ngFor="let singleBet of bet.bet">
+        <tr *ngFor="let singleBet of bet.bet; index as i">
           <th scope="row">{{ i + 1 }}</th>
           <td>{{ singleBet.game }}</td>
           <td>{{ singleBet.betOn }}</td>

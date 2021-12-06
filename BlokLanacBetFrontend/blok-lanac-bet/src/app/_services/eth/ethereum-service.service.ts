@@ -90,13 +90,15 @@ export class EthereumService {
     this.setUpEventSubscriber();*/
   }
 
-  async makeBet(bets: any, amount: number) {
+  async placeBet(bets: any, amount: number) {
     let contractBetAmount = Web3.utils.toWei(amount.toString(), 'ether');
     let contractGames: any[] = [];
     let contractBets: any[] = [];
+    let totalQuota = 1;
     bets.forEach((bet: any) => {
       contractGames.push(bet.gameId);
       contractBets.push(bet.betOn);
+      totalQuota *= bet.quota;
     });
     let contractBet = {
       games: contractGames,
@@ -104,8 +106,9 @@ export class EthereumService {
       status: 0,
       amount: contractBetAmount,
     };
+    console.log('CONTRACT BET', contractBet);
     return await this.blokLanacBetContract.methods
-      .makeBet(this.accounts[0], contractBet)
+      .placeBet(this.accounts[0], contractBet)
       .send({
         from: this.accounts[0],
         value: contractBetAmount,
@@ -131,6 +134,8 @@ export class EthereumService {
           bet: bets,
           status: 0,
           lastGameEndTime: dateOfLastGame,
+          stake: contractBetAmount,
+          totalQuota: totalQuota,
         };
         return this.betsService.addBet(newBet).toPromise();
       })
@@ -162,7 +167,7 @@ export class EthereumService {
     };
 
     this.activeBetsEventSubsriber =
-      this.blokLanacBetContract.events.DepositWinningBet(options);
+      this.blokLanacBetContract.events.UserWonBetEvent(options);
     this.activeBetsEventSubsriber
       .on('data', (event: any) => {
         console.log('DATA:', event);

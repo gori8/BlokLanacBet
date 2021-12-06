@@ -1,4 +1,4 @@
-const BookmakerKovan = artifacts.require("BookmakerKovan");
+const BookmakerKovan = artifacts.require("Bookmaker");
 const BlokLanacBet = artifacts.require("BlokLanacBet");
 
 async function main() {
@@ -6,8 +6,8 @@ async function main() {
   let instance = await BookmakerKovan.deployed();
   let instanceBLBet = await BlokLanacBet.deployed();
   let owner = await instanceBLBet.owner();
-  let result = await instance.gameScores(9460);
-  let resultQuotas = await instance.gameQuotas(9460);
+  let result = await instance.gameScores(9453);
+  let resultQuotas = await instance.gameQuotas(9453);
   console.log(
     "GAME 9460 SCORE: ",
     result.home.toNumber() + " - " + result.away.toNumber()

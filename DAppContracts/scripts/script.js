@@ -1,4 +1,4 @@
-const Bookmaker = artifacts.require("Bookmaker");
+const Bookmaker = artifacts.require("BookmakerDevelopment");
 const BlokLanacBet = artifacts.require("BlokLanacBet");
 
 async function main() {
